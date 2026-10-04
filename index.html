@@ -214,7 +214,7 @@
                 <div class="nobar-chat-side">
                     <div class="nobar-chat-messages" id="nobarMessages"></div>
                     <div class="nobar-chat-input">
-                        <input type="text" id="nobarInput" placeholder="Ketik chat nobar..." onkeydown="if(event.key==='Enter')sendNobarMsg()">
+                        <input type="text" id="BobarInput" placeholder="Ketik chat nobar..." onkeydown="if(event.key==='Enter')sendNobarMsg()">
                         <button onclick="sendNobarMsg()"><i class="fa-solid fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -258,7 +258,7 @@
     
     <div id="embedUploadArea" style="display:none;">
         <div class="input-group"><label>Paste Embed Code (IFRAME)</label><textarea id="embedCodeInput" class="input-field" rows="4" placeholder='<IFRAME SRC="https://morencius.com/embed/xxx" WIDTH=640 HEIGHT=360></IFRAME>' style="font-family:'JetBrains Mono',monospace; font-size:11px;"></textarea></div>
-        <div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="embedTitleInput" class="input-field" placeholder="Contoh: Film Episode 1"></div>
+        <div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="embedTitleInput" class="input4-field" placeholder="Contoh: Film Episode 1"></div>
         <button class="btn-modal" id="btnPostEmbed" style="background:linear-gradient(135deg, var(--accent2), #d97706)"><i class="fa-solid fa-code"></i> Post Embed Video</button>
     </div>
 
@@ -271,7 +271,7 @@
     <div id="liveTvUploadArea" style="display:none;">
         <div class="input-group"><label>Link M3U8 / M3U (HLS Stream)</label><input type="text" id="m3uLinkInput" class="input-field" placeholder="Contoh: https://example.com/live/stream.m3u8"></div>
         <div class="input-group" style="margin-bottom:8px;"><label>Nama Channel TV</label><input type="text" id="m3uTitleInput" class="input-field" placeholder="Contoh: RCTI, SCTV, dll"></div>
-        <button class="btn-modal" id="btnPostM3u" style="background:linear-gradient(135deg, var(--accent), #059669)"><i class="fa-solid fa-tower-broadcast"></i>4 Post Live TV</button>
+        <button class="btn-modal" id="btnPostM3u" style="background:linear-gradient(135deg, var(--accent), #059669)"><i class="fa-solid fa-tower-broadcast"></i> Post Live TV</button>
     </div>
     </div>
     
@@ -286,13 +286,20 @@ const ID_PREFIX='p2pch-',AVATAR_COLORS=['#10b981','#f59e0b','#ef4444','#8b5cf6',
 
 let myPeer=null,myId=null,myName='',myColor='',contacts={},activeChat=null,globalMsgCache=new Set(),isMobile=window.innerWidth<=768,dbRef=null,onlineRef=null,globalMsgRef=null,globalOnlineCount=0,videoList=[],webList=[],activeTab='chat',activeNobarVideoSrc=null;
 let isNobarHost=false, currentNobarHostId=null, nobarStateRef=null, nobarSyncInterval=null; 
-let saveTimeout=null; // Optimasi LocalStorage
+let saveTimeout=null;
 
 const $=id=>document.getElementById(id); window.addEventListener('resize',()=>{isMobile=window.innerWidth<=768;});
 
-// OPTIMASI: Auto-save tidak blocking, delay 3 detik setelah aktivitas terakhir
-function saveLocalData(){if(saveTimeout)clearTimeout(saveTimeout);saveTimeout=setTimeout(()=>DsaveLocalData,3000);}
-function DsaveLocalData(){const d={myId,myName,myColor,globalMsgCache:Array.from(globalMsgCache),contacts:{}};Object.keys(contacts).forEach(id=>{if(contacts[id].messages.length>0)d.contacts[id]={name:contacts[id].name,color:contacts[id].color,isGlobal:contacts[id].isGlobal,isWeb:contacts[id].isWeb,webUrl:contacts[id].webUrl,messages:contacts[id].messages.slice(-100)}});localStorage.setItem('p2pChatData',JSON.stringify(d));}
+function saveLocalData(){
+    if(saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        const d={myId,myName,myColor,globalMsgCache:Array.from(globalMsgCache),contacts:{}};
+        Object.keys(contacts).forEach(id=>{
+            if(contacts[id].messages.length>0) d.contacts[id]={name:contacts[id].name,color:contacts[id].color,isGlobal:contacts[id].isGlobal,isWeb:contacts[id].isWeb,webUrl:contacts[id].webUrl,messages:contacts[id].messages.slice(-100)}
+        });
+        localStorage.setItem('p2pChatData',JSON.stringify(d));
+    }, 2000);
+}
 
 function loadLocalData(){try{const r=localStorage.getItem('p2pChatData');if(r){const d=JSON.parse(r);if(d.myId&&d.myName)return d;}}catch(e){}return null;}
 function saveBackground(){localStorage.setItem('p2pChatBg',JSON.stringify({image:$('wallpaper').style.backgroundImage||'',color:$('wallpaper').style.backgroundColor||''}));}
@@ -302,12 +309,10 @@ function genId(){const c='abcdefghijklmnopqrstuvwxyz0123456789';let s='';for(let
 function getInitial(n){return(n||'?').charAt(0).toUpperCase();}
 function getColorFor(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];}
 function formatTime(ts){const d=new Date(ts);return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
--0}
 function escapeHtml(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
 function showToast(msg,type='info'){const t=document.createElement('div');t.className='toast '+type;const icons={success:'fa-circle-check',error:'fa-circle-xmark',info:'fa-circle-info'};t.innerHTML=`<i class="fa-solid ${icons[type]||icons.info}"></i> ${msg}`;$('toastContainer').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3500);}
 function setStatus(state,text){$('statusDot').className='status-dot '+state;$('statusText').textContent=text;}
 
-// OPTIMASI: Gunakan child_added daripada value pada lastGlobalMsg agar tidak delay & timpa pesan
 function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.database();dbRef=db.ref('globalChat');dbRef.orderByChild('time').limitToLast(1).on('child_added',snap=>{const data=snap.val();if(data&&data.msgId&&!globalMsgCache.has(data.msgId)){globalMsgCache.add(data.msgId);if(data.senderId!==myId){ensureGlobalContact();contacts[GLOBAL_ID].messages.push({senderId:data.senderId,senderName:data.senderName,senderColor:data.senderColor,text:data.text,time:data.time});if(activeChat===GLOBAL_ID&&activeTab==='chat')renderMessages();else if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarMessages();else contacts[GLOBAL_ID].unread++;renderContacts();saveLocalData();}}});const presenceRef=db.ref('.info/connected');onlineRef=db.ref('onlineUsers/'+myId);presenceRef.on('value',snap=>{if(snap.val()===true){onlineRef.onDisconnect().remove();onlineRef.set({name:myName,color:myColor,lastSeen:firebase.database.ServerValue.TIMESTAMP});}});db.ref('onlineUsers').on('value',snap=>{const data=snap.val()||{};globalOnlineCount=Object.keys(data).length;if(activeChat===GLOBAL_ID)updateChatStatus();renderContacts();});db.ref('videos').on('value',snap=>{const data=snap.val()||[];videoList=Object.values(data).sort((a,b)=>b.time-a.time);if(activeChat===GLOBAL_ID&&activeTab==='video')renderVideos();if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarVideos();});db.ref('webviews').on('value',snap=>{const data=snap.val()||{};webList=Object.entries(data).map(([id,val])=>({id,...val}));renderContacts();renderAdminWebList();});initNobarSync(db);setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
 
 function sendGlobalMessage(text){if(!dbRef)return;const time=Date.now();const msgId=myId+'-'+time+'-'+Math.random();ensureGlobalContact();const msgData={msgId,senderId:myId,senderName:myName,senderColor:myColor,text,time};contacts[GLOBAL_ID].messages.push({...msgData});globalMsgCache.add(msgId);dbRef.push().set(msgData);saveLocalData();}
@@ -366,7 +371,6 @@ function renderAdminWebList(){const list=$('webDeleteList');if(!webList.length){
 function deleteWeb(id){if(!confirm('Hapus web ini?'))return;firebase.database().ref('webviews/'+id).remove().then(()=>showToast('WebView dihapus.','success'));}
 function extractYtId(url){const r=url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?#]+)/);return r?r[1]:null;}
 
-// ADMIN TAB SWITCHING
 document.getElementById('tabVidYoutube').onclick = () => {
     document.getElementById('youtubeUploadArea').style.display = 'block';
     document.getElementById('embedUploadArea').style.display = 'none';
@@ -408,7 +412,6 @@ document.getElementById('tabVidLive').onclick = () => {
     document.getElementById('tabVidLive').style.borderColor = 'var(--accent)'; document.getElementById('tabVidLive').style.color = 'var(--accent)';
 };
 
-// EMBED CODE POST HANDLER
 document.getElementById('btnPostEmbed').onclick = () => {
     const rawCode = document.getElementById('embedCodeInput').value.trim();
     const title = document.getElementById('embedTitleInput').value.trim() || 'Embed Video';
@@ -423,7 +426,6 @@ document.getElementById('btnPostEmbed').onclick = () => {
     } else { showToast('Gagal membaca SRC dari iframe. Pastikan ada SRC="..."', 'error'); }
 };
 
-// INIT SETUP
 document.addEventListener('DOMContentLoaded',()=>{
     const saved=loadLocalData();
     if(saved&&saved.myId){myId=saved.myId;myName=saved.myName;myColor=saved.myColor||getColorFor(myId);globalMsgCache=new Set(saved.globalMsgCache||[]);if(saved.contacts){Object.keys(saved.contacts).forEach(id=>{contacts[id]=saved.contacts[id];contacts[id].connection=null;});}}else{initPeer();}
