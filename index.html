@@ -137,7 +137,8 @@
         .msg-input:focus { border-color:var(--accent); } .msg-input::placeholder { color:var(--text-muted); opacity:0.5; }
         .btn-send { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg, var(--accent), #059669); border:none; color:#fff; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition: transform 0.2s; flex-shrink:0; } .btn-send:hover { transform:scale(1.05); }
 
-        .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1; position:relative; text-align:center; padding:40px 20px; background: rgba(6,10,19,0.6); backdrop-filter: blur(8px); } .empty-icon { font-size:48px; color:var(--border-light); margin-bottom:16px; } .empty-title { font-size:18px; font-weight:600; margin-bottom:6px; } .empty-desc { font-size:13px; color:var(--text-muted); max-width:300px; line-height:1.5; }
+        /* PERBAIKAN: Empty state dibuat tembus pandang agar tidak menutupi Nobar di mobile */
+        .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1; position:relative; text-align:center; padding:40px 20px; background: transparent; } .empty-icon { font-size:48px; color:var(--border-light); margin-bottom:16px; } .empty-title { font-size:18px; font-weight:600; margin-bottom:6px; } .empty-desc { font-size:13px; color:var(--text-muted); max-width:300px; line-height:1.5; }
 
         .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(6,10,19,0.85); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity 0.3s; } .modal-overlay.show { opacity:1; pointer-events:all; }
         .modal-box { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:400px; max-width:90vw; position:relative; overflow:hidden; transform:translateY(20px); transition:transform 0.3s; max-height: 90vh; overflow-y: auto; } 
@@ -180,7 +181,8 @@
         
         <main class="chat-area" id="chatArea">
             <div class="chat-bg-pattern"></div>
-            <div class="empty-state" id="emptyState"><div class="empty-icon"><i class="fa-regular fa-comments"></i></div><div class="empty-title">Selamat datang!</div><div class="empty-desc">Pilih <strong style="color:var(--global-color)">Global Chat</strong> untuk mulai.</div></div>
+            <!-- PERBAIKAN: Teks Selamat Datang dihapus total agar tidak menghalangi -->
+            <div class="empty-state" id="emptyState"></div>
             
             <div class="chat-header" id="chatHeader" style="display:none;">
                 <button class="btn-icon mobile-back" id="btnMobileBack"><i class="fa-solid fa-arrow-left"></i></button>
@@ -408,7 +410,6 @@ function renderVideos() {
     });
     c.innerHTML = html;
     
-    // Init HLS
     videoList.forEach(v => {
         if(v.type === 'live') {
             const vidEl = document.getElementById(`hls-${v.time}`);
