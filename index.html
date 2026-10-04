@@ -134,18 +134,17 @@
 
 <script>
 // =====================================================================
-// KONFIGURASI FIREBASE KAMU (Sudah ditambahkan databaseURL otomatis)
+// KONFIGURASI FIREBASE KAMU (Sudah diupdate yang bener)
 // =====================================================================
 const firebaseConfig = {
-    apiKey: "AIzaSyB52mJ0oQXeD_5vPZEA4-8n6v7iXx5ADe4",
-    authDomain: "chat-a2e2e.firebaseapp.com",
-    // Gue tambahkan ini karena tadi kurang:
-    databaseURL: "https://chat-a2e2e-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "chat-a2e2e",
-    storageBucket: "chat-a2e2e.firebasestorage.app",
-    messagingSenderId: "1043144329680",
-    appId: "1:1043144329680:web:b5b8563b684cd91136d1d5",
-    measurementId: "G-Q1TJXZ1PGQ"
+  apiKey: "AIzaSyB52mJ0oQXeD_5vPZEA4-8n6v7iXx5ADe4",
+  authDomain: "chat-a2e2e.firebaseapp.com",
+  databaseURL: "https://chat-a2e2e-default-rtdb.firebaseio.com",
+  projectId: "chat-a2e2e",
+  storageBucket: "chat-a2e2e.firebasestorage.app",
+  messagingSenderId: "1043144329680",
+  appId: "1:1043144329680:web:ef0350ffba93414d36d1d5",
+  measurementId: "G-M6CD7HXCHS"
 };
 // =====================================================================
 
@@ -215,7 +214,7 @@ function initFirebase() {
         setStatus('connected', 'Global & P2P Aktif');
     } catch(e) {
         console.error("Firebase Error:", e);
-        showToast("Gagal koneksi server Global. Fitur PM tetap jalan.", "error");
+        showToast("Gagal koneksi server Global. Cek config Firebase!", "error");
         setStatus('connecting', 'Global Error');
     }
 }
