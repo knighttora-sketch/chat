@@ -256,7 +256,10 @@ function switchTab(tab){activeTab=tab;$('tabChat').className='tab-btn'+(tab==='c
 
 function isM3u8(url){return url&&(url.includes('.m3u8')||url.includes('.m3u'));}
 
-function renderVideos(){const area=$('videoContainer');if(videoList.length===0){area.innerHTML=`<div class="video-empty"><i class="fa-solid fa-film"></i><div style="font-size:14px; font-weight:600; margin-bottom:4px">Belum ada video</div><div style="font-size:12px">Admin belum memposting video apapun.</div></div>`;return;}let html='';videoList.forEach(v=>{html+=`<div class="video-card"><div class="video-wrapper">${isM3u8(v.embedSrc)?`<video src="${escapeHtml(v.embedSrc)}" controls></video>`:`<iframe src="${escapeHtml(v.embedSrc)}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`}</div><div class="video-info"><div class="video-title">${v.isLive?'<i class="fa-solid fa-tower-broadcast" style="color:var(--danger);margin-right:4px"></i>':''}${escapeHtml(v.title||'Video')}</div><div style="font-size:10px; color:var(--text-muted)">${formatTime(v.time)}</div></div></div>`;});area.innerHTML=html;}
+// PERBAIKAN CORS M3U8: Menggunakan proxy agar browser tidak memblokir
+function getProxiedUrl(url){ return `https://corsproxy.io/?${encodeURIComponent(url)}`; }
+
+function renderVideos(){const area=$('videoContainer');if(videoList.length===0){area.innerHTML=`<div class="video-empty"><i class="fa-solid fa-film"></i><div style="font-size:14px; font-weight:600; margin-bottom:4px">Belum ada video</div><div style="font-size:12px">Admin belum memposting video apapun.</div></div>`;return;}let html='';videoList.forEach(v=>{const src=isM3u8(v.embedSrc)?getProxiedUrl(v.embedSrc):escapeHtml(v.embedSrc); html+=`<div class="video-card"><div class="video-wrapper">${isM3u8(v.embedSrc)?`<video src="${src}" controls></video>`:`<iframe src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`}</div><div class="video-info"><div class="video-title">${v.isLive?'<i class="fa-solid fa-tower-broadcast" style="color:var(--danger);margin-right:4px"></i>':''}${escapeHtml(v.title||'Video')}</div><div style="font-size:10px; color:var(--text-muted)">${formatTime(v.time)}</div></div></div>`;});area.innerHTML=html;}
 
 function renderNobarVideos(){
     const player=$('nobarMainPlayer');
@@ -272,8 +275,19 @@ let currentHls=null;
 function selectNobarVideo(src,index){
     activeNobarVideoSrc=src; const player=$('nobarMainPlayer');
     if(currentHls){currentHls.destroy();currentHls=null;}
-    if(isM3u8(src)){ player.innerHTML=`<video id="nobarVideo" style="opacity:0.3"></video><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`; const video=document.getElementById('nobarVideo'); if(Hls.isSupported()){const hls=new Hls();hls.loadSource(src);hls.attachMedia(video);currentHls=hls;}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src=src;} }
-    else{ player.innerHTML=`<iframe id="nobarIframe" src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay" style="opacity:0.3"></iframe><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`; }
+    
+    if(isM3u8(src)){
+        const proxiedSrc = getProxiedUrl(src);
+        player.innerHTML=`<video id="nobarVideo" style="opacity:0.3"></video><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`;
+        const video=document.getElementById('nobarVideo');
+        if(Hls.isSupported()){
+            const hls=new Hls(); hls.loadSource(proxiedSrc); hls.attachMedia(video); currentHls=hls;
+            hls.on(Hls.Events.MANIFEST_PARSED,()=>{ showToast('Live TV siap diputar!','success'); });
+            hls.on(Hls.Events.ERROR,(event,data)=>{ if(data.fatal){ showToast('Gagal memuat M3U8 (CORS/Format Error)','error'); }});
+        } else if(video.canPlayType('application/vnd.apple.mpegurl')){ video.src=proxiedSrc; }
+    } else {
+        player.innerHTML=`<iframe id="nobarIframe" src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay" style="opacity:0.3"></iframe><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`;
+    }
     const thumbs=document.querySelectorAll('.nobar-thumb-card'); thumbs.forEach((t,i)=>{if(i===index)t.classList.add('active-thumb');else t.classList.remove('active-thumb');});
 }
 
