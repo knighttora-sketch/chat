@@ -78,17 +78,32 @@
         .video-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); text-align:center; padding:20px; }
         .video-empty i { font-size:48px; margin-bottom:12px; opacity:0.3; }
 
-        /* NOBAR LAYOUT - RAK FILM */
+        /* NOBAR LAYOUT - SPLIT SCREEN 50/50 & CUSTOM PLAY BUTTON */
         .nobar-container { flex:1; display:flex; gap:0; z-index:1; position:relative; overflow:hidden; }
-        .nobar-video-side { flex:1.8; background: linear-gradient(180deg, #05080f 0%, #0c1220 100%); display:flex; flex-direction:column; overflow: hidden; }
-        .nobar-video-list { flex:1; overflow-y:auto; padding:16px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:16px; align-content: start; }
-        .nobar-video-list .video-card { border-radius:10px; border: 1px solid var(--border); transition: border-color 0.3s ease; }
-        .nobar-video-list .video-card:hover { border-color: var(--accent2); }
-        .nobar-video-list .video-wrapper { padding-top:56.25%; }
-        .nobar-video-list .video-info { padding:8px 12px; background: var(--bg-card); }
-        .nobar-video-list .video-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Sisi Kiri: Video Player Besar */
+        .nobar-video-side { flex:1; background:#000; display:flex; flex-direction:column; overflow:hidden; position:relative; }
+        .nobar-video-list { display:none; } /* Disembunyikan karena diganti split screen */
+        
+        .nobar-main-player { flex:1; position:relative; background:#000; display:flex; align-items:center; justify-content:center; }
+        .nobar-main-player iframe { width:100%; height:100%; border:0; position:absolute; inset:0; }
+        .nobar-main-player .nobar-empty { color:var(--text-muted); text-align:center; z-index:2; }
+        .nobar-main-player .nobar-empty i { font-size:48px; margin-bottom:12px; opacity:0.3; display:block; }
+        
+        /* Play Button Custom */
+        .custom-play-btn { position:absolute; z-index:5; width:70px; height:70px; border-radius:50%; background:rgba(245,158,11,0.9); border:none; color:#fff; font-size:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(245,158,11,0.5); transition: transform 0.2s, background 0.2s; }
+        .custom-play-btn:hover { transform:scale(1.1); background:var(--accent2); }
+        .custom-play-btn i { margin-left:4px; } /* Visual center fix for play icon */
 
-        /* PERBAIKAN SCROLL CHAT NOBAR */
+        /* Thumbnail List di bawah video */
+        .nobar-thumb-list { height:100px; overflow-x:auto; overflow-y:hidden; display:flex; gap:8px; padding:8px; background:rgba(6,10,19,0.9); border-top:1px solid var(--border); align-items:center; }
+        .nobar-thumb-card { width:120px; flex-shrink:0; cursor:pointer; border:2px solid transparent; border-radius:6px; overflow:hidden; transition: border-color 0.2s, transform 0.2s; position:relative; background:var(--bg-card); }
+        .nobar-thumb-card:hover { border-color:var(--accent2); transform:translateY(-2px); }
+        .nobar-thumb-card.active-thumb { border-color:var(--accent2); box-shadow:0 0 10px var(--accent2-glow); }
+        .nobar-thumb-img { width:100%; height:55px; object-fit:cover; background:#000; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:20px; }
+        .nobar-thumb-title { font-size:9px; padding:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; color:var(--text); }
+
+        /* Sisi Kanan: Chat */
         .nobar-chat-side { flex:1; border-left:1px solid var(--border); display:flex; flex-direction:column; background:rgba(6,10,19,0.95); backdrop-filter:blur(8px); touch-action: pan-y; overscroll-behavior: contain; }
         .nobar-chat-messages { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:6px; touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
         .nobar-chat-input { padding:10px; border-top:1px solid var(--border); display:flex; gap:6px; background: rgba(12,18,32,0.9); }
@@ -96,8 +111,6 @@
         .nobar-chat-input input:focus { border-color:var(--accent2); }
         .nobar-chat-input button { width:40px; border-radius:10px; background:linear-gradient(135deg, var(--accent2), #d97706); border:none; color:#fff; cursor:pointer; transition: transform 0.2s; }
         .nobar-chat-input button:hover { transform:scale(1.05); }
-        .nobar-empty { grid-column: 1 / -1; display:flex; align-items:center; justify-content:center; color:var(--text-muted); text-align:center; padding:40px 20px; font-size:13px; flex-direction: column; }
-        .nobar-empty i { font-size: 32px; margin-bottom: 10px; opacity: 0.3; }
 
         .chat-header { padding:12px 16px; border:1px solid var(--border); display:flex; align-items:center; gap:10px; background: rgba(12,18,32,0.85); backdrop-filter: blur(12px); z-index:2; }
         .chat-header-avatar { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; }
@@ -116,7 +129,6 @@
 
         .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1; position:relative; text-align:center; padding:40px 20px; background: rgba(6,10,19,0.6); backdrop-filter: blur(8px); } .empty-icon { font-size:48px; color:var(--border-light); margin-bottom:16px; } .empty-title { font-size:18px; font-weight:600; margin-bottom:6px; } .empty-desc { font-size:13px; color:var(--text-muted); max-width:300px; line-height:1.5; }
 
-        /* PERBAIKAN MODAL ADMIN AGAR BISA DI SCROLL */
         .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(6,10,19,0.85); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity 0.3s; } .modal-overlay.show { opacity:1; pointer-events:all; }
         .modal-box { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:400px; max-width:90vw; position:relative; overflow:hidden; transform:translateY(20px); transition:transform 0.3s; max-height: 90vh; overflow-y: auto; } 
         .modal-overlay.show .modal-box { transform:translateY(0); }
@@ -142,7 +154,6 @@
             .sidebar { position: absolute; inset: 0; z-index: 10; width: 100%; transition: transform 0.3s ease; } .sidebar.slide-out { transform: translateX(-100%); } .chat-area { position: absolute; inset: 0; z-index: 5; transform: translateX(100%); transition: transform 0.3s ease; } .chat-area.slide-in { transform: translateX(0); } .mobile-back { display:flex !important; } 
             .nobar-container { flex-direction: column; }
             .nobar-video-side { flex: 1; }
-            .nobar-video-list { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 10px; }
             .nobar-chat-side { flex: 1; border-left:0; border-top:1px solid var(--border); }
         }
         .mobile-back { display:none; }
@@ -183,10 +194,13 @@
             <div class="messages-area" id="messagesArea" style="display:none;"></div>
             <div class="video-container" id="videoContainer" style="display:none;"></div>
             
-            <!-- NOBAR SECTION -->
+            <!-- NOBAR SECTION (SPLIT SCREEN) -->
             <div class="nobar-container" id="nobarContainer" style="display:none;">
                 <div class="nobar-video-side">
-                    <div class="nobar-video-list" id="nobarVideoList"></div>
+                    <div class="nobar-main-player" id="nobarMainPlayer">
+                        <div class="nobar-empty"><i class="fa-solid fa-film"></i>Pilih video di bawah untuk Nobar</div>
+                    </div>
+                    <div class="nobar-thumb-list" id="nobarThumbList"></div>
                 </div>
                 <div class="nobar-chat-side">
                     <div class="nobar-chat-messages" id="nobarMessages"></div>
@@ -213,7 +227,7 @@
 const firebaseConfig = { apiKey: "AIzaSyB52mJ0oQXeD_5vPZEA4-8n6v7iXx5ADe4", authDomain: "chat-a2e2e.firebaseapp.com", databaseURL: "https://chat-a2e2e-default-rtdb.firebaseio.com", projectId: "chat-a2e2e", storageBucket: "chat-a2e2e.firebasestorage.app", messagingSenderId: "1043144329680", appId: "1:1043144329680:web:ef0350ffba93414d36d1d5", measurementId: "G-M6CD7HXCHS" };
 const ID_PREFIX='p2pch-',AVATAR_COLORS=['#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#6366f1','#84cc16'],BG_COLORS=['#060a13','#0f172a','#1a1a2e','#16213e','#0f3460','#1b1b2f','#e8d5b7','#f0e6d3','#2d3436','#636e72'],GLOBAL_ID='__global__';
 
-let myPeer=null,myId=null,myName='',myColor='',contacts={},activeChat=null,globalMsgCache=new Set(),isMobile=window.innerWidth<=768,dbRef=null,onlineRef=null,globalMsgRef=null,globalOnlineCount=0,videoList=[],activeTab='chat';
+let myPeer=null,myId=null,myName='',myColor='',contacts={},activeChat=null,globalMsgCache=new Set(),isMobile=window.innerWidth<=768,dbRef=null,onlineRef=null,globalMsgRef=null,globalOnlineCount=0,videoList=[],activeTab='chat', activeNobarVideoSrc=null;
 const $=id=>document.getElementById(id); window.addEventListener('resize',()=>{isMobile=window.innerWidth<=768;});
 
 function saveLocalData(){const d={myId,myName,myColor,globalMsgCache:Array.from(globalMsgCache),contacts:{}};Object.keys(contacts).forEach(id=>{if(contacts[id].messages.length>0)d.contacts[id]={name:contacts[id].name,color:contacts[id].color,isGlobal:contacts[id].isGlobal,messages:contacts[id].messages.slice(-100)}});localStorage.setItem('p2pChatData',JSON.stringify(d));}
@@ -247,12 +261,71 @@ function renderContacts(){ensureGlobalContact();const list=$('contactsList');con
 
 function switchTab(tab){activeTab=tab;$('tabChat').className='tab-btn'+(tab==='chat'?' active':'');$('tabVideo').className='tab-btn vid-tab'+(tab==='video'?' active':'');$('tabNobar').className='tab-btn nobar-tab'+(tab==='nobar'?' active':'');$('messagesArea').style.display='none';$('inputArea').style.display='none';$('videoContainer').style.display='none';$('nobarContainer').style.display='none';if(tab==='chat'){$('messagesArea').style.display='flex';$('inputArea').style.display='flex';renderMessages();}else if(tab==='video'){$('videoContainer').style.display='flex';renderVideos();}else if(tab==='nobar'){$('nobarContainer').style.display='flex';renderNobarVideos();renderNobarMessages();}}
 
-function renderVideos(){const area=$('videoContainer');if(videoList.length===0){area.innerHTML=`<div class="video-empty"><i class="fa-solid fa-film"></i><div style="font-size:14px; font-weight:600; margin-bottom:4px">Belum ada video</div><div style="font-size:12px">Admin belum memposting video apapun.</div></div>`;return;}let html='';videoList.forEach(v=>{html+=`<div class="video-card"><div class="video-wrapper"><iframe src="${escapeHtml(v.embedSrc)}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div><div class="video-info"><div class="video-title">${escapeHtml(v.title||'Video')}</div><div style="font-size:10px; color:var(--text-muted)">${formatTime(v.time)}</div></div></div>`;});area.innerHTML=html;}
+function renderVideos(){const area=$('videoContainer');if(videoList.length===0){area.innerHTML=`<div class="video-empty"><i class="fa-solid fa-film"></i><div style="font-size:14px; font-weight:600; margin-bottom:4px">Belum ada video</div><div style="font-size:12px">Admin belum memposting video apapun.</div></div>`;return;}let html='';videoList.forEach(v=>{html+=`<div class="video-card"><div class="video-wrapper"><iframe src="${escapeHtml(v.embedSrc)}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div><div class="video-info"><div class="video-title">${escapeHtml(v.title||'Video')}</div><div style="font-size:10px; color:var(--text-muted)">${formatTime(v.time)}</div></div></div>`;});area.innerHTML=html;}
 
-// PERBAIKAN NOBAR: Iframe fullscreen & Rak Film
-function renderNobarVideos(){const area=$('nobarVideoList');if(videoList.length===0){area.innerHTML=`<div class="nobar-empty"><i class="fa-solid fa-film"></i><span>Admin belum post video untuk Nobar</span></div>`;return;}let html='';videoList.forEach(v=>{html+=`<div class="video-card"><div class="video-wrapper"><iframe src="${escapeHtml(v.embedSrc)}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay"></iframe></div><div class="video-info"><div class="video-title"><i class="fa-solid fa-play" style="font-size:9px; color:var(--accent2); margin-right:4px"></i>${escapeHtml(v.title||'Video')}</div></div></div>`;});area.innerHTML=html;}
+// NOBAR SPLIT-SCREEN & CUSTOM PLAY
+function renderNobarVideos(){
+    const player=$('nobarMainPlayer');
+    const thumbList=$('nobarThumbList');
+    
+    // Render Thumbs
+    if(videoList.length===0){
+        player.innerHTML=`<div class="nobar-empty"><i class="fa-solid fa-film"></i>Belum ada video untuk Nobar</div>`;
+        thumbList.innerHTML='';
+        activeNobarVideoSrc=null;
+        return;
+    }
+    
+    let thumbHtml='';
+    videoList.forEach((v, i) => {
+        const isActive = v.embedSrc === activeNobarVideoSrc;
+        thumbHtml += `<div class="nobar-thumb-card ${isActive?'active-thumb':''}" onclick="selectNobarVideo('${escapeHtml(v.embedSrc)}', ${i})">
+            <div class="nobar-thumb-img"><i class="fa-solid fa-play-circle"></i></div>
+            <div class="nobar-thumb-title">${escapeHtml(v.title||'Video')}</div>
+        </div>`;
+    });
+    thumbList.innerHTML = thumbHtml;
 
-// PERBAIKAN NOBAR: Chat Scroll Mutlak
+    // Auto load first video if none selected
+    if(!activeNobarVideoSrc){
+        selectNobarVideo(videoList[0].embedSrc, 0);
+    } else {
+        // Re-render player if needed (just to maintain state)
+        selectNobarVideo(activeNobarVideoSrc, videoList.findIndex(v => v.embedSrc === activeNobarVideoSrc));
+    }
+}
+
+function selectNobarVideo(src, index){
+    activeNobarVideoSrc = src;
+    const player = $('nobarMainPlayer');
+    
+    // Build player with Custom Play Button
+    player.innerHTML = `
+        <iframe id="nobarIframe" src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay" style="opacity:0.3"></iframe>
+        <button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>
+    `;
+    
+    // Update active thumb border
+    const thumbs = document.querySelectorAll('.nobar-thumb-card');
+    thumbs.forEach((t, i) => {
+        if(i === index) t.classList.add('active-thumb');
+        else t.classList.remove('active-thumb');
+    });
+}
+
+function playNobarVideo(){
+    const iframe = document.getElementById('nobarIframe');
+    const btn = document.querySelector('.custom-play-btn');
+    if(iframe && btn){
+        // Inject autoplay param to force play
+        if(!iframe.src.includes('autoplay=1')){
+            iframe.src += (iframe.src.includes('?') ? '&' : '?') + 'autoplay=1';
+        }
+        iframe.style.opacity = '1';
+        btn.style.display = 'none'; // Hide button after play
+    }
+}
+
 function renderNobarMessages(){if(!contacts[GLOBAL_ID])return;const area=$('nobarMessages');const msgs=contacts[GLOBAL_ID].messages;let html='';msgs.forEach(msg=>{if(msg.system){html+=`<div class="msg-sys">${escapeHtml(msg.text)}</div>`;}else{const isMine=msg.senderId===myId;const row=`<div class="msg-row ${isMine?'sent-global':'received'}"><div class="msg-bubble" style="max-width:90%;font-size:12px;padding:8px 12px">${!isMine?`<div class="msg-sender" style="color:${msg.senderColor||'var(--accent)'}">${escapeHtml(msg.senderName)}</div>`:''}<div>${escapeHtml(msg.text)}</div><div class="msg-time">${formatTime(msg.time)}</div></div></div>`;html+=row;}});area.innerHTML=html;requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight;});}
 
 function sendNobarMsg(){const input=$('nobarInput');const text=input.value.trim();if(!text)return;sendGlobalMessage(text);input.value='';renderNobarMessages();}
@@ -275,7 +348,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     loadBackground();
     const savedData=loadLocalData();
     
-    // PERBAIKAN AKUN: Langsung masuk jika ada data tersimpan
     if(savedData && savedData.myId && savedData.myName){
         myId=savedData.myId; myName=savedData.myName; myColor=savedData.myColor;
         if(savedData.contacts){Object.keys(savedData.contacts).forEach(id=>{contacts[id]=savedData.contacts[id];contacts[id].connection=null;});}
@@ -309,7 +381,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         saveLocalData();
     });
 
-    // PERBAIKAN AKUN: Tombol Keluar Akun
     $('btnLogout').addEventListener('click',()=>{
         if(confirm('Keluar dari akun? Data chat disimpan, tapi Anda harus memasukkan nama lagi saat masuk.')){
             if(myPeer && !myPeer.destroyed) myPeer.destroy();
@@ -333,7 +404,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     $('msgInput').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
     $('btnMobileBack').addEventListener('click',closeChatMobile);
 
-    // BG Settings
     $('btnBgSettings').addEventListener('click',()=>{$('bgModal').classList.add('show');});
     $('bgModalClose').addEventListener('click',()=>{$('bgModal').classList.remove('show');});
     const bgGrid=$('bgOptions');BG_COLORS.forEach(c=>{const btn=document.createElement('div');btn.className='bg-color-btn';btn.style.background=c;btn.onclick=()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor=c;saveBackground();};bgGrid.appendChild(btn);});
@@ -341,7 +411,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     $('fileInput').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{$('wallpaper').style.backgroundImage=`url('${ev.target.result}')`;saveBackground();};reader.readAsDataURL(file);});
     $('btnResetBg').addEventListener('click',()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor='';localStorage.removeItem('p2pChatBg');});
 
-    // Admin
     let isAdmin=false;
     $('btnAdmin').addEventListener('click',()=>{$('adminModal').classList.add('show');if(isAdmin)$('adminLoginArea').style.display='none';$('adminActionsArea').style.display=isAdmin?'block':'none';});
     $('adminModalClose').addEventListener('click',()=>{$('adminModal').classList.remove('show');});
@@ -360,7 +429,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     $('btnClearVideos').addEventListener('click',()=>{if(confirm('Hapus semua video?')){firebase.database().ref('videos').remove();showToast('Video dihapus!','success');}});
     $('btnChangeAdminPass').addEventListener('click',()=>{showToast('Fitur ganti password hanya contoh (simpan ke DB untuk real).','info');});
 
-    // PERBAIKAN NOBAR: Fix touch scroll pada HP
     const nobarMsgArea = $('nobarMessages');
     nobarMsgArea.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });
 });
