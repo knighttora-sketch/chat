@@ -150,6 +150,7 @@
 
     <div id="chatApp">
         <aside class="sidebar" id="sidebar">
+            <!-- BUG SEBELUMNYA ADA DI SINI (class@=) SEKARANG SUDAH DIPERBAIKI -->
             <div class="sidebar-header"><div class="my-info"><div class="my-avatar" id="myAvatar">?</div><div><div class="my-name" id="myNameDisplay">-</div><div class="my-id-small" id="myIdSmall" title="Klik untuk salin">-</div></div></div><div class="sidebar-actions"><button class="btn-sidebar" id="btnAddContact"><i class="fa-solid fa-lock"></i> PM</button><button class="btn-sidebar" id="btnCopyId2"><i class="fa-regular fa-copy"></i> ID</button><button class="btn-sidebar" id="btnBgSettings"><i class="fa-solid fa-palette"></i></button><button class="btn-sidebar danger-btn" id="btnAdmin"><i class="fa-solid fa-shield-halved"></i></button><button class="btn-sidebar danger-btn" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button></div></div>
             <div class="search-box"><div class="search-wrap"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" id="searchInput" placeholder="Cari kontak PM..."></div></div>
             <div class="contacts-list" id="contactsList"></div>
@@ -271,7 +272,6 @@ function renderVideos(){const area=$('videoContainer');if(videoList.length===0){
 // --- NOBAR HOST/VIEWER & SYNC SYSTEM ---
 // ==========================================
 
-// Fungsi Host Broadcast ke semua Viewer
 function broadcastNobarState(state) {
     if (!isNobarHost) return;
     Object.keys(contacts).forEach(id => {
@@ -281,17 +281,13 @@ function broadcastNobarState(state) {
     });
 }
 
-// Fungsi Viewer menerima data dari Host
 function handleNobarSync(state) {
-    if (isNobarHost) return; // Host mengabaikan perintah sync
-    
-    // Jika host ganti film
+    if (isNobarHost) return;
     if (state.action === 'switch') {
         const idx = videoList.findIndex(v => v.embedSrc === state.src);
-        if(idx !== -1) selectNobarVideo(state.src, idx, true); // true = auto viewer mode
+        if(idx !== -1) selectNobarVideo(state.src, idx, true);
         return;
     }
-
     const isYT = ytPlayer !== null;
     const vid = $('nobarVid');
     if (!isYT && !vid) return;
@@ -323,7 +319,6 @@ function renderNobarVideos(){
     if(!activeNobarVideoSrc){selectNobarVideo(videoList[0].embedSrc,0);}else{const idx=videoList.findIndex(v=>v.embedSrc===activeNobarVideoSrc); if(idx!==-1) selectNobarVideo(activeNobarVideoSrc,idx);}
 }
 
-// Host ganti film
 function switchNobarVideo(src, index) {
     activeNobarVideoSrc = src;
     selectNobarVideo(src, index);
@@ -334,7 +329,6 @@ function selectNobarVideo(src, index, forceViewer=false){
     activeNobarVideoSrc=src; 
     const player=$('nobarMainPlayer');
     
-    // Destroy previous instances
     if(currentHls){currentHls.destroy();currentHls=null;}
     if(ytPlayer){ytPlayer.destroy();ytPlayer=null;}
     if(syncInterval){clearInterval(syncInterval);syncInterval=null;}
@@ -366,7 +360,6 @@ function selectNobarVideo(src, index, forceViewer=false){
 
     player.innerHTML = playerHTML + roleUI;
 
-    // Auto init
     if (isM3u8(src)) {
         const vid = $('nobarVid');
         if (Hls.isSupported()) {
@@ -408,14 +401,15 @@ function setNobarRole(role) {
             vid.onpause = () => broadcastNobarState({ action: 'pause', time: vid.currentTime });
             vid.onseeked = () => broadcastNobarState({ action: 'seek', time: vid.currentTime });
         } else if (isYT) {
-            // Untuk YT, host kirim waktu berkala agar viewer sink
             syncInterval = setInterval(() => {
-                if(ytPlayer && ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                    broadcastNobarState({ action: 'play', time: ytPlayer.getCurrentTime() });
-                } else if(ytPlayer && ytPlayer.getPlayerState() === YT.PlayerState.PAUSED) {
-                    broadcastNobarState({ action: 'pause', time: ytPlayer.getCurrentTime() });
+                if(ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+                    if(ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                        broadcastNobarState({ action: 'play', time: ytPlayer.getCurrentTime() });
+                    } else if(ytPlayer.getPlayerState() === YT.PlayerState.PAUSED) {
+                        broadcastNobarState({ action: 'pause', time: ytPlayer.getCurrentTime() });
+                    }
                 }
-            }, 3000); // setiap 3 detik
+            }, 3000);
         } else {
             showToast("Mode Embed Non-YT: Viewer harus play manual.", "info");
         }
@@ -469,32 +463,27 @@ document.addEventListener('DOMContentLoaded',()=>{
     $('btnAdmin').onclick=()=>openModal('adminModal');
     $('adminModalClose').onclick=()=>closeModal('adminModal');
     
-    // Admin logic simplified for brevity, assume password is "admin"
     $('btnAdminLogin').onclick=()=>{
-        if($('adminPassInput').value==='admin'){ // Change this logic to match your DB
+        if($('adminPassInput').value==='admin'){
             $('adminLoginArea').style.display='none';
             $('adminActionsArea').style.display='block';
             showToast('Login Admin berhasil!','success');
         } else showToast('Password salah!','error');
     };
     
-    // Admin Tabs
     $('tabVidYoutube').onclick=()=>{$('youtubeUploadArea').style.display='block';$('customUploadArea').style.display='none';$('liveTvUploadArea').style.display='none';};
     $('tabVidCustom').onclick=()=>{$('youtubeUploadArea').style.display='none';$('customUploadArea').style.display='block';$('liveTvUploadArea').style.display='none';};
     $('tabVidLive').onclick=()=>{$('youtubeUploadArea').style.display='none';$('customUploadArea').style.display='none';$('liveTvUploadArea').style.display='block';};
     
-    // Admin Post Video
-    const postVideoToDb=(embedSrc, title, isLive=false)=>{if(!dbRef)return;firebase.database().ref('videos').push({embedSrc,title,isLive,time:Date.now()});showToast('Video diposting!','success');};
+    const postVideoToDb=(embedSrc, title, isLive=false)=>{if(!dbRef){showToast('Firebase belum terhubung!','error');return;}firebase.database().ref('videos').push({embedSrc,title,isLive,time:Date.now()});showToast('Video diposting!','success');};
     $('btnPostYt').onclick=()=>{const link=$('ytLinkInput').value.trim();const title=$('ytTitleInput').value.trim()||'YouTube Video';if(!link)return;postVideoToDb(getYTEmbedUrl(link), title);};
     $('btnPostCustom').onclick=()=>{const link=$('customLinkInput').value.trim();const title=$('customTitleInput').value.trim()||'Custom Video';if(!link)return;postVideoToDb(link, title);};
     $('btnPostM3u').onclick=()=>{const link=$('m3uLinkInput').value.trim();const title=$('m3uTitleInput').value.trim()||'Live TV';if(!link)return;postVideoToDb(link, title, true);};
     
-    // Admin Delete
     $('btnClearGlobal').onclick=()=>{firebase.database().ref('globalChat').remove();showToast('Chat Global dihapus.','success');};
     $('btnClearOnline').onclick=()=>{firebase.database().ref('onlineUsers').remove();showToast('Data Online dibersihkan.','success');};
     $('btnClearVideos').onclick=()=>{firebase.database().ref('videos').remove();showToast('Semua Video dihapus.','success');};
     
-    // Chat Interactions
     $('btnSend').onclick=sendMessage;
     $('msgInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}};
     $('msgInput').oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';};
