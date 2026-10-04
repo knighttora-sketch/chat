@@ -261,7 +261,45 @@ function sendGlobalMessage(text){if(!dbRef)return;const time=Date.now();const ms
 
 (function(){const c=$('particles');for(let i=0;i<12;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*3+1;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.background=Math.random()>0.5?'var(--accent)':'var(--global-color)';p.style.animationDuration=(Math.random()*15+10)+'s';p.style.animationDelay=(Math.random()*10)+'s';c.appendChild(p);}})();
 
-function initPeer(forceNewId=null){myId=forceNewId||genId();$('myIdDisplay').textContent=myId;myColor=getColorFor(myId);myPeer=new Peer(myId,{debug:0});myPeer.on('open',()=>{$('btnJoin').disabled=!(!$('usernameInput').value.trim());});myPeer.on('connection',conn=>handleIncomingConnection(conn));myPeer.on('error',err=>{if(err.type==='unavailable-id'){myPeer.destroy();initPeer();}else if(err.type==='peer-unavailable'){showToast('ID tidak ditemukan/offline.','error');}});myPeer.on('disconnected',()=>{setTimeout(()=>{if(myPeer&&!myPeer.destroyed)myPeer.reconnect();},3000);});}
+function initPeer(forceNewId=null){
+    myId=forceNewId||genId();
+    $('myIdDisplay').textContent=myId;
+    myColor=getColorFor(myId);
+    
+    // TAMBAHAN: Timeout jika ID lama dari localStorage gagal connect ke server PeerJS
+    let peerTimeout = setTimeout(() => {
+        if($('btnJoin').disabled) {
+            console.log("ID lama gagal, membuat ID baru...");
+            localStorage.removeItem('p2pChatData'); // Hapus data lama
+            if(myPeer && !myPeer.destroyed) myPeer.destroy();
+            initPeer(); // Buat ID baru
+        }
+    }, 5000); // 5 detik batas waktu
+
+    myPeer=new Peer(myId,{debug:0});
+    
+    myPeer.on('open',()=>{
+        clearTimeout(peerTimeout); // Berhasil terhubung, batalkan timeout
+        $('btnJoin').disabled=!(!$('usernameInput').value.trim());
+    });
+    
+    myPeer.on('connection',conn=>handleIncomingConnection(conn));
+    
+    myPeer.on('error',err=>{
+        clearTimeout(peerTimeout);
+        if(err.type==='unavailable-id'){
+            if(myPeer && !myPeer.destroyed) myPeer.destroy();
+            initPeer(); // Auto retry dengan ID baru jika tabrakan
+        }else if(err.type==='peer-unavailable'){
+            showToast('ID tidak ditemukan/offline.','error');
+        }
+    });
+    
+    myPeer.on('disconnected',()=>{
+        setTimeout(()=>{if(myPeer&&!myPeer.destroyed)myPeer.reconnect();},3000);
+    });
+}
+
 function handleIncomingConnection(conn){conn.on('open',()=>{conn.send({type:'info-request'});});conn.on('data',data=>{const peerId=conn.peer;if(data.type==='info-response'){addOrUpdateContact(peerId,data.name||peerId,conn);showToast(`${data.name||peerId} terhubung via PM!`,'success');}else if(data.type==='info-request'){conn.send({type:'info-response',name:myName});}else if(data.type==='pm'){if(!contacts[peerId])addOrUpdateContact(peerId,peerId,conn);receivePM(peerId,data);}});conn.on('close',()=>{if(contacts[peerId]){contacts[peerId].connection=null;if(activeChat===peerId)updateChatStatus();renderContacts();}});conn.on('error',()=>{});}
 function connectToPeer(targetId,customName){if(targetId===myId){showToast('Tidak bisa hubungi ID sendiri!','error');return;}if(contacts[targetId]&&contacts[targetId].connection){showToast('Sudah terhubung.','info');openChat(targetId);return;}const conn=myPeer.connect(targetId,{reliable:true});conn.on('open',()=>{conn.send({type:'info-response',name:myName});addOrUpdateContact(targetId,customName||targetId,conn);showToast(`Terhubung PM dengan ${customName||targetId}!`,'success');conn.send({type:'info-request'});});conn.on('data',data=>{if(data.type==='info-response'){if(contacts[targetId]&&!customName){contacts[targetId].name=data.name||targetId;renderContacts();}}else if(data.type==='info-request'){conn.send({type:'info-response',name:myName});}else if(data.type==='pm'){receivePM(targetId,data);}});conn.on('close',()=>{if(contacts[targetId]){contacts[targetId].connection=null;if(activeChat===targetId)updateChatStatus();renderContacts();}});conn.on('error',err=>{showToast('Gagal: '+err.type,'error');});}
 
@@ -421,7 +459,7 @@ window.addEventListener('message', (event) => {
 });
 // ====================================================
 
-function renderNobarMessages(){/* Placeholder - Same as renderMessages but for nobarMessages area */}
+function renderNobarMessages(){/* Placeholder */}
 function sendNobarMsg(){/* Placeholder */}
 
 function openChat(id){activeChat=id;contacts[id].unread=0;if(isMobile){$('sidebar').classList.add('slide-out');$('chatArea').classList.add('slide-in');}renderContacts();updateChatHeader();if(id===GLOBAL_ID){$('tabBar').style.display='flex';$('relayBanner').style.display='flex';$('relayInfo').textContent=`${globalOnlineCount} user online`;switchTab(activeTab);}else{$('tabBar').style.display='none';$('relayBanner').style.display='none';switchTab('chat');}}
@@ -447,7 +485,6 @@ function sendMessage(){const input=$('msgInput');const text=input.value.trim();i
  $('btnMobileBack').addEventListener('click',()=>{$('sidebar').classList.remove('slide-out');$('chatArea').classList.remove('slide-in');});
  $('searchInput').addEventListener('input',renderContacts);
 
-// Admin logic placeholders (existing from original)
  $('btnAdmin').addEventListener('click',()=>{$('adminModal').classList.add('show');});
  $('adminModalClose').addEventListener('click',()=>{$('adminModal').classList.remove('show');});
  $('btnBgSettings').addEventListener('click',()=>{$('bgModal').classList.add('show');});
