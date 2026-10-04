@@ -83,11 +83,16 @@
         .nobar-video-side { flex:1; background:#000; display:flex; flex-direction:column; overflow:hidden; position:relative; }
         
         /* Tambahan untuk Host Control */
-        .nobar-host-bar { padding:8px 12px; display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border-bottom:1px solid var(--border); flex-shrink: 0; z-index: 5;}
+        .nobar-host-bar { padding:8px 12px; display:flex; flex-direction: column; gap: 6px; background:var(--bg-card); border-bottom:1px solid var(--border); flex-shrink: 0; z-index: 5;}
+        .nobar-host-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .btn-host { display:inline-flex; width:auto; padding:6px 12px; font-size:11px; font-weight:600; background:var(--bg-elevated); border:1px solid var(--accent2); border-radius:6px; color:var(--accent2); cursor:pointer; font-family:'Space Grotesk',sans-serif; transition: all 0.2s; align-items: center; gap: 4px; }
         .btn-host:hover { background: rgba(245,158,11,0.1); }
         .btn-host.active-host { border-color: var(--danger); color: var(--danger); }
         .nobar-host-info { font-size:11px; color:var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        
+        .manual-sync-area { display:none; width:100%; gap:6px; align-items:center; }
+        .manual-sync-area input { flex:1; padding:4px 8px; font-size:11px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:6px; color:var(--text); outline:none; font-family: 'JetBrains Mono', monospace; }
+        .manual-sync-area button { padding:4px 10px; font-size:10px; background:var(--accent2); border:none; border-radius:6px; color:#000; font-weight:700; cursor:pointer; }
 
         .nobar-main-player { flex:1; position:relative; background:#000; display:flex; align-items:center; justify-content:center; min-height: 0; }
         .nobar-main-player iframe, .nobar-main-player video { width:100%; height:100%; border:0; position:absolute; inset:0; background:#000; }
@@ -199,8 +204,14 @@
             <div class="nobar-container" id="nobarContainer" style="display:none;">
                 <div class="nobar-video-side">
                     <div class="nobar-host-bar">
-                        <button class="btn-host" id="btnBeHost" onclick="toggleHost()"><i class="fa-solid fa-crown"></i> Jadi Host</button>
-                        <div class="nobar-host-info" id="nobarHostInfo">Tidak ada host</div>
+                        <div class="nobar-host-row">
+                            <button class="btn-host" id="btnBeHost" onclick="toggleHost()"><i class="fa-solid fa-crown"></i> Jadi Host</button>
+                            <div class="nobar-host-info" id="nobarHostInfo">Tidak ada host</div>
+                        </div>
+                        <div class="manual-sync-area" id="manualSyncArea">
+                            <input type="text" id="manualTimeInput" placeholder="Menit:Detik (cth: 05:30)">
+                            <button onclick="pushManualTime()">Sync</button>
+                        </div>
                     </div>
                     <div class="nobar-main-player" id="nobarMainPlayer">
                         <div class="nobar-empty"><i class="fa-solid fa-film"></i>Pilih video di bawah untuk Nobar</div>
@@ -233,7 +244,7 @@ const firebaseConfig = { apiKey: "AIzaSyB52mJ0oQXeD_5vPZEA4-8n6v7iXx5ADe4", auth
 const ID_PREFIX='p2pch-',AVATAR_COLORS=['#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#6366f1','#84cc16'],BG_COLORS=['#060a13','#0f172a','#1a1a2e','#16213e','#0f3460','#1b1b2f','#e8d5b7','#f0e6d3','#2d3436','#636e72'],GLOBAL_ID='__global__';
 
 let myPeer=null,myId=null,myName='',myColor='',contacts={},activeChat=null,globalMsgCache=new Set(),isMobile=window.innerWidth<=768,dbRef=null,onlineRef=null,globalMsgRef=null,globalOnlineCount=0,videoList=[],activeTab='chat',activeNobarVideoSrc=null;
-let isNobarHost=false, currentNobarHostId=null, nobarStateRef=null, nobarSyncInterval=null; // Variabel Nobar Host/Viewer
+let isNobarHost=false, currentNobarHostId=null, nobarStateRef=null, nobarSyncInterval=null; 
 
 const $=id=>document.getElementById(id); window.addEventListener('resize',()=>{isMobile=window.innerWidth<=768;});
 
@@ -252,8 +263,7 @@ function setStatus(state,text){$('statusDot').className='status-dot '+state;$('s
 function playNotif(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)(),o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;o.type='sine';g.gain.value=0.04;o.start();o.stop(ctx.currentTime+0.08);}catch(e){}}
 
 function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.database();dbRef=db.ref('globalChat');globalMsgRef=db.ref('lastGlobalMsg');globalMsgRef.on('value',snap=>{const data=snap.val();if(data&&data.msgId&&!globalMsgCache.has(data.msgId)){globalMsgCache.add(data.msgId);if(data.senderId!==myId){ensureGlobalContact();contacts[GLOBAL_ID].messages.push({senderId:data.senderId,senderName:data.senderName,senderColor:data.senderColor,text:data.text,time:data.time});if(activeChat===GLOBAL_ID&&activeTab==='chat')renderMessages();else if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarMessages();else contacts[GLOBAL_ID].unread++;renderContacts();playNotif();saveLocalData();}}});const presenceRef=db.ref('.info/connected');onlineRef=db.ref('onlineUsers/'+myId);presenceRef.on('value',snap=>{if(snap.val()===true){onlineRef.onDisconnect().remove();onlineRef.set({name:myName,color:myColor,lastSeen:firebase.database.ServerValue.TIMESTAMP});}});db.ref('onlineUsers').on('value',snap=>{const data=snap.val()||{};globalOnlineCount=Object.keys(data).length;if(activeChat===GLOBAL_ID)updateChatStatus();renderContacts();});db.ref('videos').on('value',snap=>{const data=snap.val()||[];videoList=Object.values(data).sort((a,b)=>b.time-a.time);if(activeChat===GLOBAL_ID&&activeTab==='video')renderVideos();if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarVideos();});
-initNobarSync(db); // Inisialisasi Sync Nobar
-setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
+initNobarSync(db); setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
 
 function sendGlobalMessage(text){if(!dbRef)return;const time=Date.now();const msgId=myId+'-'+time+'-'+Math.random();ensureGlobalContact();const msgData={msgId,senderId:myId,senderName:myName,senderColor:myColor,text,time};contacts[GLOBAL_ID].messages.push({...msgData});globalMsgCache.add(msgId);dbRef.push().set(msgData);globalMsgRef.set(msgData);saveLocalData();}
 
@@ -299,12 +309,13 @@ function selectNobarVideo(src,index, fromSync=false){
             hls.on(Hls.Events.MANIFEST_PARSED,()=>{ showToast('Live TV siap diputar!','success'); });
             hls.on(Hls.Events.ERROR,(event,data)=>{ if(data.fatal){ showToast('Gagal memuat M3U8 (CORS/Format Error)','error'); }});
         } else if(video.canPlayType('application/vnd.apple.mpegurl')){ video.src=proxiedSrc; }
+        $('manualSyncArea').style.display = 'none'; // Sembunyikan manual sync untuk video native
     } else {
         player.innerHTML=`<iframe id="nobarIframe" src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay" style="opacity:0.3"></iframe><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`;
+        if(isNobarHost) $('manualSyncArea').style.display = 'flex'; // Tampilkan manual sync untuk Iframe
     }
     const thumbs=document.querySelectorAll('.nobar-thumb-card'); thumbs.forEach((t,i)=>{if(i===index)t.classList.add('active-thumb');else t.classList.remove('active-thumb');});
     
-    // Host mengupdate state pilihan video ke Firebase
     if(isNobarHost && !fromSync && nobarStateRef) {
         nobarStateRef.update({ currentSrc: src, isPlaying: false, currentTime: 0 });
     }
@@ -327,7 +338,6 @@ function playNobarVideo(fromSync = false){
     }
     if(btn) btn.remove();
 
-    // Host mengupdate state Play ke Firebase
     if(isNobarHost && !fromSync && nobarStateRef) {
         nobarStateRef.update({ 
             isPlaying: true, 
@@ -352,7 +362,6 @@ function initNobarSync(db) {
         }
         currentNobarHostId = state.hostId;
         
-        // Jika saya Viewer, sync video saya berdasarkan data Host
         if (!isNobarHost && state.hostId !== myId) {
             syncAsViewer(state);
         }
@@ -362,30 +371,31 @@ function initNobarSync(db) {
 
 function toggleHost() {
     if (isNobarHost) {
-        // Lepas role Host
         isNobarHost = false;
         if (nobarSyncInterval) clearInterval(nobarSyncInterval);
         if (nobarStateRef) nobarStateRef.remove();
+        $('manualSyncArea').style.display = 'none';
         showToast('Kamu berhenti jadi Host', 'info');
     } else {
-        // Jadi Host
         if (currentNobarHostId && currentNobarHostId !== myId) {
             if(!confirm('Sudah ada Host lain! Ambil alih role Host?')) return;
         }
         isNobarHost = true;
         if (nobarStateRef) {
             nobarStateRef.update({ hostId: myId, hostName: myName });
-            nobarStateRef.onDisconnect().remove(); // Hapus state host jika disconnect
+            nobarStateRef.onDisconnect().remove();
         }
         startHostSync();
+        // Cek apakah video sekarang iframe, jika ya tampilkan manual sync
+        if(document.getElementById('nobarIframe')) $('manualSyncArea').style.display = 'flex';
         showToast('Kamu sekarang Host Nobar!', 'success');
     }
     updateNobarHostUI();
 }
 
 function updateNobarHostUI() {
-    const btn = document.getElementById('btnBeHost');
-    const info = document.getElementById('nobarHostInfo');
+    const btn = $('btnBeHost');
+    const info = $('nobarHostInfo');
     if (isNobarHost) {
         btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Lepas Host';
         btn.classList.add('active-host');
@@ -412,63 +422,78 @@ function startHostSync() {
         const video = document.getElementById('nobarVideo');
         const stateToUpdate = {
             currentSrc: activeNobarVideoSrc || null,
-            isPlaying: video ? !video.paused : true // Anggap play jika iframe
+            isPlaying: video ? !video.paused : true 
         };
         
-        // Hanya kirim currentTime jika itu video HTML5 (bukan iframe)
         if (video) {
             stateToUpdate.currentTime = video.currentTime;
+            $('manualSyncArea').style.display = 'none'; // Sembunyikan jika video native
         } else {
-            stateToUpdate.currentTime = 0; // Iframe tidak bisa dibaca waktunya secara lintas domain
+            // Jangan otomatis update currentTime untuk Iframe (biarkan manual)
+            if(!stateToUpdate.currentTime) stateToUpdate.currentTime = 0; 
         }
         
         nobarStateRef.update(stateToUpdate);
-    }, 3000); // Update setiap 3 detik
+    }, 3000); 
+}
+
+// Fungsi Push Waktu Manual untuk Iframe (Mega, Drive, dll)
+function pushManualTime() {
+    const val = $('manualTimeInput').value;
+    if(!val) return;
+    const parts = val.split(':').map(Number);
+    let secs = 0;
+    if (parts.length === 2) secs = parts[0] * 60 + parts[1]; // MM:SS
+    else if (parts.length === 3) secs = parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS
+    else secs = parseInt(val); // Detik langsung
+
+    if(nobarStateRef) {
+        nobarStateRef.update({ currentTime: secs, isPlaying: true });
+        showToast(`Waktu sync diupdate ke ${val}`, 'success');
+    }
 }
 
 function syncAsViewer(state) {
     if (!state.currentSrc) return;
 
-    // 1. Jika video beda, load video yang sama
     if (activeNobarVideoSrc !== state.currentSrc) {
         const idx = videoList.findIndex(v => v.embedSrc === state.currentSrc);
-        selectNobarVideo(state.currentSrc, idx >= 0 ? idx : 0, true); // true = dari sync
+        selectNobarVideo(state.currentSrc, idx >= 0 ? idx : 0, true); 
     }
 
     const video = document.getElementById('nobarVideo');
     const iframe = document.getElementById('nobarIframe');
 
     if (video) {
-        // Sync Video HTML5 (M3U8)
         if (state.isPlaying && video.paused) {
-            video.play().catch(e => console.log("Autoplay blocked"));
+            video.play().catch(e => {});
         }
         if (!state.isPlaying && !video.paused) {
             video.pause();
         }
-        // Seek jika selisih waktu > 2 detik
         if (state.currentTime && Math.abs(video.currentTime - state.currentTime) > 2) {
             video.currentTime = state.currentTime;
         }
     } else if (iframe) {
-        // Sync Embed Iframe (YouTube, dll)
         if (state.isPlaying && iframe.style.opacity === '0.3') {
-            playNobarVideo(true); // Auto-play untuk viewer
+            playNobarVideo(true); 
         }
         
-        // Jika viewer baru datang, push ulang iframe dengan parameter ?start & autoplay
-        if (state.isPlaying && state.currentTime > 0) {
+        // Jika host push waktu manual (untuk Iframe Mega/Drive)
+        if (state.currentTime > 0) {
             const currentSrc = iframe.src.split('?')[0];
-            // Hanya update src jika belum memiliki parameter start yang sama (untuk hindari infinite reload)
-            if (!iframe.src.includes(`start=${Math.floor(state.currentTime)}`)) {
+            const expectedStart = `start=${Math.floor(state.currentTime)}`;
+            // Cegah reload terus menerus, hanya reload jika parameter berubah
+            if (!iframe.src.includes(expectedStart)) {
                 let newSrc = currentSrc + `?autoplay=1&start=${Math.floor(state.currentTime)}`;
-                if (currentSrc.includes('youtube.com') || currentSrc.includes('youtu.be')) {
-                    newSrc += '&enablejsapi=1';
-                }
-                iframe.src = newSrc; // Ini akan reload iframe viewer ke menit yang sama
+                iframe.src = newSrc; 
                 iframe.style.opacity = '1';
                 const btn = document.querySelector('.custom-play-btn');
                 if (btn) btn.remove();
+                
+                const m = Math.floor(state.currentTime / 60);
+                const s = Math.floor(state.currentTime % 60);
+                showToast(`Host di menit ${m}:${s.toString().padStart(2,'0')}. Mencoba seek... (Jika gagal, geser manual)`, 'info');
             }
         }
     }
@@ -498,7 +523,6 @@ function hideAdminModal(){$('adminModal').classList.remove('show');}
 
 function enterApp(){myName=$('usernameInput').value.trim()||'User'+Math.floor(Math.random()*99);$('myAvatar').textContent=getInitial(myName);$('myNameDisplay').textContent=myName;$('myIdSmall').textContent=myId;$('entrance').classList.add('hidden');setTimeout(()=>{$('chatApp').classList.add('active');openChat(GLOBAL_ID);},600);initFirebase();saveLocalData();}
 
-// Init
 document.addEventListener('DOMContentLoaded',()=>{
     loadBackground();
     const saved=loadLocalData();
@@ -529,7 +553,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     
     $('searchInput').addEventListener('input',renderContacts);
 
-    // BG Options
     let bgHtml='';BG_COLORS.forEach(c=>{bgHtml+=`<div class="bg-color-btn" style="background:${c}" onclick="document.getElementById('wallpaper').style.backgroundImage='none';document.getElementById('wallpaper').style.backgroundColor='${c}';saveBackground()"></div>`;});$('bgOptions').innerHTML=bgHtml;
     $('uploadArea').addEventListener('click',()=>$('fileInput').click());
     $('fileInput').addEventListener('change',e=>{const file=e.target.files[0];if(file){const r=new FileReader();r.onload=ev=>{$('wallpaper').style.backgroundImage=`url(${ev.target.result})`;saveBackground();};r.readAsDataURL(file);}});
@@ -537,7 +560,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     
     $('btnLogout').addEventListener('click',()=>{if(confirm('Keluar dari chat?')){localStorage.removeItem('p2pChatData');location.reload();}});
 
-    // Admin Logic (Basic placeholder for brevity, assumes admin functions exist in real app)
     $('btnAdminLogin').addEventListener('click',()=>{if($('adminPassInput').value==='admin123'){$('adminLoginArea').style.display='none';$('adminActionsArea').style.display='block';}else{showToast('Password salah','error');}});
     $('tabVidYoutube').addEventListener('click',()=>{$('youtubeUploadArea').style.display='block';$('customUploadArea').style.display='none';$('liveTvUploadArea').style.display='none';});
     $('tabVidCustom').addEventListener('click',()=>{$('youtubeUploadArea').style.display='none';$('customUploadArea').style.display='block';$('liveTvUploadArea').style.display='none';});
