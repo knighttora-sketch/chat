@@ -294,8 +294,10 @@ const $=id=>document.getElementById(id); window.addEventListener('resize',()=>{i
 
 function saveLocalData(){const d={myId,myName,myColor,globalMsgCache:Array.from(globalMsgCache),contacts:{}};Object.keys(contacts).forEach(id=>{if(contacts[id].messages.length>0)d.contacts[id]={name:contacts[id].name,color:contacts[id].color,isGlobal:contacts[id].isGlobal,isWeb:contacts[id].isWeb,webUrl:contacts[id].webUrl,messages:contacts[id].messages.slice(-100)}});localStorage.setItem('p2pChatData',JSON.stringify(d));}
 function loadLocalData(){try{const r=localStorage.getItem('p2pChatData');if(r){const d=JSON.parse(r);if(d.myId&&d.myName)return d;}}catch(e){}return null;}
+
+// PERBAIKAN BUG: Typo 'p2p9pChatBg' menjadi 'p2pChatBg'
 function saveBackground(){localStorage.setItem('p2pChatBg',JSON.stringify({image:$('wallpaper').style.backgroundImage||'',color:$('wallpaper').style.backgroundColor||''}));}
-function loadBackground(){try{const r=localStorage.getItem('p2p9pChatBg');if(r){const d=JSON.parse(r);if(d.image&&d.image!=='none')$('wallpaper').style.backgroundImage=d.image;else if(d.color)$('wallpaper').style.backgroundColor=d.color;}}catch(e){}}
+function loadBackground(){try{const r=localStorage.getItem('p2pChatBg');if(r){const d=JSON.parse(r);if(d.image&&d.image!=='none')$('wallpaper').style.backgroundImage=d.image;else if(d.color)$('wallpaper').style.backgroundColor=d.color;}}catch(e){}}
 
 function genId(){const c='abcdefghijklmnopqrstuvwxyz0123456789';let s='';for(let i=0;i<8;i++)s+=c[Math.floor(Math.random()*c.length)];return ID_PREFIX+s;}
 function getInitial(n){return(n||'?').charAt(0).toUpperCase();}
@@ -462,6 +464,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     const saved=loadLocalData();
     if(saved&&saved.myId){myId=saved.myId;myName=saved.myName;myColor=saved.myColor||getColorFor(myId);globalMsgCache=new Set(saved.globalMsgCache||[]);if(saved.contacts){Object.keys(saved.contacts).forEach(id=>{contacts[id]=saved.contacts[id];contacts[id].connection=null;});}}else{initPeer();}
     if(myId){$('myIdDisplay').textContent=myId;$('usernameInput').value=myName;$('btnJoin').disabled=false;}
+    
+    // PERBAIKAN BUG: Load background langsung saat halaman dibuka
+    loadBackground();
+    
     $('usernameInput').addEventListener('input',()=>{$('btnJoin').disabled=!$('usernameInput').value.trim();});
     $('btnJoin').addEventListener('click',()=>{myName=$('usernameInput').value.trim();if(!myName)return;if(!myPeer)initPeer();$('entrance').classList.add('hidden');$('chatApp').classList.add('active');$('myAvatar').textContent=getInitial(myName);$('myNameDisplay').textContent=myName;$('myIdSmall').textContent=myId;initFirebase();renderContacts();saveLocalData();});
     $('btnCopyId').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
