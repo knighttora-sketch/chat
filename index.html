@@ -212,7 +212,7 @@
 <div class="modal-overlay" id="addModal"><div class="modal-box"><button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button><div class="modal-title"><i class="fa-solid fa-lock" style="color:var(--accent);margin-right:6px"></i>Chat Privat (PM)</div><p class="modal-sub">Masukkan ID unik teman untuk memulai percakapan pribadi (P2P)</p><div class="input-group"><label>ID Teman</label><input type="text" id="targetIdInput" class="input-field" placeholder="Contoh: p2pch-a7f3b2..." autocomplete="off"></div><div class="input-group"><label>Nama Panggilan (opsional)</label><input type="text" id="targetNameInput" class="input-field" placeholder="Nama yang mudah diingat..." maxlength="24" autocomplete="off"></div><button class="btn-modal" id="btnConnect" style="background:linear-gradient(135deg, var(--accent2), #d97706)">Hubungkan</button></div></div>
 <div class="modal-overlay" id="bgModal"><div class="modal-box"><button class="modal-close" id="bgModalClose"><i class="fa-solid fa-xmark"></i></button><div class="modal-title"><i class="fa-solid fa-palette" style="color:var(--accent2);margin-right:6px"></i>Background Chat</div><p class="modal-sub">Pilih warna solid atau upload gambar dari galeri</p><div class="bg-options" id="bgOptions"></div><div class="upload-area" id="uploadArea"><i class="fa-solid fa-cloud-arrow-up" style="font-size:24px; display:block; margin-bottom:8px"></i>Klik atau seret gambar</div><input type="file" id="fileInput" accept="image/*" style="display:none"><div style="margin-top:12px; text-align:center;"><button class="btn-sidebar" id="btnResetBg" style="display:inline-flex; width:auto; padding:8px 16px;"><i class="fa-solid fa-rotate-left"></i> Reset Default</button></div></div></div>
 
-<div class="modal-overlay" id="adminModal"><div class="modal-box" style="width:450px"><button class="modal-close" id="adminModalClose"><i class="fa-solid fa-xmark"></i></button><div class="modal-title"><i class="fa-solid fa-shield-halved" style="color:var(--danger);margin-right:6px"></i>Admin Tools</div><p class="modal-sub">Hapus chat, kelola video, atau user online.</p><div id="adminLoginArea"><div class="input-group"><label>Password Admin</label><input type="password" id="adminPassInput" class="input-field" placeholder="Masukkan password..."></div><button class="btn-modal danger-modal" id="btnAdminLogin"><i class="fa-solid fa-right-to-bracket"></i> Login Admin</button></div><div id="adminActionsArea" style="display:none;"><button class="btn-modal danger-modal" id="btnClearGlobal"><i class="fa-solid fa-trash-can"></i> Hapus Semua Chat Global</button><button class="btn-modal danger-modal" id="btnClearOnline"><i class="fa-solid fa-broom"></i> Bersihkan Data User Online</button><button class="btn-modal danger-modal" id="btnClearVideos"><i class="fa-solid fa-film"></i> Hapus Semua Video & TV</button><div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"><div class="modal-title" style="font-size:15px; margin-bottom:12px;"><i class="fa-solid fa-video" style="color:var(--danger);margin-right:6px"></i>Post Konten Baru</div><div style="display:flex; gap:6px; margin-bottom:12px;"><button class="btn-sidebar" id="tabVidYoutube" style="flex:1; padding:10px; border-color:var(--danger); color:var(--danger)"><i class="fa-brands fa-youtube"></i> YT</button><button class="btn-sidebar" id="tabVidCustom" style="flex:1; padding:10px;"><i class="fa-solid fa-code"></i> Embed</button><button class="btn-sidebar" id="tabVidLive" style="flex:1; padding:10px;"><i class="fa-solid fa-tower-broadcast"></i> Live TV</button></div><div id="youtubeUploadArea"><div class="input-group"><label>Link YouTube</label><input type="text" id="ytLinkInput" class="input-field" placeholder="Contoh: https://youtube.com/watch?v=..."></div><div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="ytTitleInput" class="input-field" placeholder="Contoh: Musik Relaksasi"></div><button class="btn-modal" id="btnPostYt" style="background:linear-gradient(135deg, #cc0000, #990000)"><i class="fa-brands fa-youtube"></i> Post YouTube</button></div><div id="customUploadArea" style="display:none;"><div class="input-group"><label>Direct Embed Link / Src</label><input type="text" id="customLinkInput" class="input-field" placeholder="Contoh: https://player.vimeo.com/video/123"></div><div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="customTitleInput" class="input-field" placeholder="Contoh: Video Dailymotion"></div><button class="btn-modal" id="btnPostCustom" style="background:linear-gradient(135deg, var(--accent2), #d97706)"><i class="fa-solid fa-upload"></i> Post Custom Video</button></div><div id="liveTvUploadArea" style="display:none;"><div class="input-group"><label>Link M3U8 / M3U (HLS Stream)</label><input type="text" id="m3uLinkInput" class="input-field" placeholder="Contoh: https://example.com/live/stream.m3u8"></div><div class="input-group" style="margin-bottom:8px;"><label>Nama Channel TV</label><input type="text" id="m3uTitleInput" class="input-field" placeholder="Contoh: RCTI, SCTV, dll"></div><button class="btn-modal" id="btnPostM3u" style="background:linear-gradient(135deg, var(--accent), #059669)"><i class="fa-solid fa-tower-broadcast"></i> Post Live TV</button></div></div><div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"><div class="input-group" style="margin-bottom:8px;"><label>Ganti Password Admin</label><input type="password" id="newAdminPassInput" class="input-field" placeholder="Password baru..."></div><button class="btn-modal" id="btnChangeAdminPass" style="background:linear-gradient(135deg, #334155, #475569)"><i class="fa-solid fa-key"></i> Update Password</button></div></div></div></div>
+<div class="modal-overlay" id="adminModal"><div class="modal-box" style="width:450px"><button class="modal-close" id="adminModalClose"><i class="fa-solid fa-xmark"></i></button><div class="modal-title"><i class="fa-solid fa-shield-halved" style="color:var(--danger);margin-right:6px"></i>Admin Tools</div><p class="modal-sub">Hapus chat, kelola video, atau user online.</p><div id="adminLoginArea"><div class="input-group"><label>Password Admin</label><input type="password" id="adminPassInput" class="input-field" placeholder="Masukkan password..."></div><button class="btn-modal danger-modal" id="btnAdminLogin"><i class="fa-solid fa-right-to-bracket"></i> Login Admin</button></div><div id="adminActionsArea" style="display:none;"><button class="btn-modal danger-modal" id="btnClearGlobal"><i class="fa-solid fa-trash-can"></i> Hapus Semua Chat Global</button><button class="btn-modal danger-modal" id="btnClearOnline"><i class="fa-solid fa-broom"></i> Bersihkan Data User Online</button><button class="btn-modal danger-modal" id="btnClearVideos"><i class="fa-solid fa-film"></i> Hapus Semua Video & TV</button><div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"><div class="modal-title" style="font-size:15px; margin-bottom:12px;"><i class="fa-solid fa-video" style="color:var(--danger);margin-right:6px"></i>Post Konten Baru</div><div style="display:flex; gap:6px; margin-bottom:12px;"><button class="btn-sidebar" id="tabVidYoutube" style="flex:1; padding:10px; border-color:var(--danger); color:var(--danger)"><i class="fa-brands fa-youtube"></i> YT</button><button class="btn-sidebar" id="tabVidCustom" style="flex:1; padding:10px;"><i class="fa-solid fa-code"></i> Embed</button><button class="btn-sidebar" id="tabVidLive" style="flex:1; padding:10px;"><i class="fa-solid fa-tower-broadcast"></i> Live TV</button></div><div id="youtubeUploadArea"><div class="input-group"><label>Link YouTube</label><input type="text" id="ytLinkInput" class="input-field" placeholder="Contoh: https://youtube.com/watch?v=..."></div><div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="ytTitleInput" class="input-field" placeholder="Contoh: Musik Relaksasi"></div><button class="btn-modal" id="btnPostYt" style="background:linear-gradient(135deg, #cc0000, #990000)"><i class="fa-brands fa-youtube"></i> Post YouTube</button></div><div id="customUploadArea" style="display:none;"><div class="input-group"><label>Embed Code (iframe)</label><textarea id="customLinkInput" class="input-field" rows="4" placeholder='<IFRAME SRC="https://morencius.com/embed/45uxcctfzddr" FRAMEBORDER=0 MARGINWIDTH=0 MARGINHEIGHT=0 SCROLLING=NO WIDTH=640 HEIGHT=360 allowfullscreen></IFRAME>' style="resize:vertical; font-size:12px; font-family:'JetBrains Mono',monospace;"></textarea></div><div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="customTitleInput" class="input-field" placeholder="Contoh: Film Drama Korea"></div><button class="btn-modal" id="btnPostCustom" style="background:linear-gradient(135deg, var(--accent2), #d97706)"><i class="fa-solid fa-upload"></i> Post Custom Video</button></div><div id="liveTvUploadArea" style="display:none;"><div class="input-group"><label>Link M3U8 / M3U (HLS Stream)</label><input type="text" id="m3uLinkInput" class="input-field" placeholder="Contoh: https://example.com/live/stream.m3u8"></div><div class="input-group" style="margin-bottom:8px;"><label>Nama Channel TV</label><input type="text" id="m3uTitleInput" class="input-field" placeholder="Contoh: RCTI, SCTV, dll"></div><button class="btn-modal" id="btnPostM3u" style="background:linear-gradient(135deg, var(--accent), #059669)"><i class="fa-solid fa-tower-broadcast"></i> Post Live TV</button></div></div><div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"><div class="input-group" style="margin-bottom:8px;"><label>Ganti Password Admin</label><input type="password" id="newAdminPassInput" class="input-field" placeholder="Password baru..."></div><button class="btn-modal" id="btnChangeAdminPass" style="background:linear-gradient(135deg, #334155, #475569)"><i class="fa-solid fa-key"></i> Update Password</button></div></div></div></div>
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -259,7 +259,7 @@ function isM3u8(url){return url&&(url.includes('.m3u8')||url.includes('.m3u'));}
 // PERBAIKAN CORS M3U8: Menggunakan proxy agar browser tidak memblokir
 function getProxiedUrl(url){ return `https://corsproxy.io/?${encodeURIComponent(url)}`; }
 
-function renderVideos(){const area=$('videoContainer');if(videoList.length===0){area.innerHTML=`<div class="video-empty"><i class="fa-solid fa-film"></i><div style="font-size:14px; font-weight:600; margin-bottom:4px">Belum ada video</div><div style="font-size:12px">Admin belum memposting video apapun.</div></div>`;return;}let html='';videoList.forEach(v=>{const src=isM3u8(v.embedSrc)?getProxiedUrl(v.embedSrc):escapeHtml(v.embedSrc); html+=`<div class="video-card"><div class="video-wrapper">${isM3u8(v.embedSrc)?`<video src="${src}" controls></video>`:`<iframe src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`}</div><div class="video-info"><div class="video-title">${v.isLive?'<i class="fa-solid fa-tower-broadcast" style="color:var(--danger);margin-right:4px"></i>':''}${escapeHtml(v.title||'Video')}</div><div style="font-size:10px; color:var(--text-muted)">${formatTime(v.time)}</div></div></div>`;});area.innerHTML=html;}
+function renderVideos(){const area=$('videoContainer');if(videoList.length===0){area.innerHTML=`<div class="video-empty"><i class="fa-solid fa-film"></i><div style="font-size:14px; font-weight:600; margin-bottom:4px">Belum ada video</div><div style="font-size:12px">Admin belum memposting video apapun.</div></div>`;return;}let html='';videoList.forEach(v=>{const src=isM3u8(v.embedSrc)?getProxiedUrl(v.embedSrc):escapeHtml(v.embedSrc); html+=`<div class="video-card"><div class="video-wrapper">${isM3u8(v.embedSrc)?`<video src="${src}" controls></video>`:`<iframe src="${src}" allowfullscreen allow="encrypted-media; autoplay; fullscreen; clipboard-write; gyroscope; picture-in-picture"></iframe>`}</div><div class="video-info"><div class="video-title">${v.isLive?'<i class="fa-solid fa-tower-broadcast" style="color:var(--danger);margin-right:4px"></i>':''}${escapeHtml(v.title||'Video')}</div><div style="font-size:10px; color:var(--text-muted)">${formatTime(v.time)}</div></div></div>`;});area.innerHTML=html;}
 
 function renderNobarVideos(){
     const player=$('nobarMainPlayer');
@@ -286,98 +286,128 @@ function selectNobarVideo(src,index){
             hls.on(Hls.Events.ERROR,(event,data)=>{ if(data.fatal){ showToast('Gagal memuat M3U8 (CORS/Format Error)','error'); }});
         } else if(video.canPlayType('application/vnd.apple.mpegurl')){ video.src=proxiedSrc; }
     } else {
-        player.innerHTML=`<iframe id="nobarIframe" src="${src}" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay" style="opacity:0.3"></iframe><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`;
+        player.innerHTML=`<iframe id="nobarIframe" src="${src}" allowfullscreen allow="encrypted-media; autoplay; fullscreen; clipboard-write; gyroscope; picture-in-picture" style="opacity:0.3"></iframe><button class="custom-play-btn" onclick="playNobarVideo()"><i class="fa-solid fa-play"></i></button>`;
     }
     const thumbs=document.querySelectorAll('.nobar-thumb-card'); thumbs.forEach((t,i)=>{if(i===index)t.classList.add('active-thumb');else t.classList.remove('active-thumb');});
 }
 
 function playNobarVideo(){
     const video=document.getElementById('nobarVideo'); const iframe=document.getElementById('nobarIframe'); const btn=document.querySelector('.custom-play-btn');
-    if(btn)btn.style.display='none';
-    if(video){video.style.opacity='1';video.play().catch(e=>showToast('Tekan layar untuk putar','info'));}
-    if(iframe){if(!iframe.src.includes('autoplay=1')){iframe.src+=(iframe.src.includes('?')?'&':'?')+'autoplay=1';}iframe.style.opacity='1';}
+    if(video){video.style.opacity='1';video.play();} if(iframe){iframe.style.opacity='1';iframe.contentWindow.postMessage('play','*');} if(btn)btn.remove();
 }
 
-function renderNobarMessages(){if(!contacts[GLOBAL_ID])return;const area=$('nobarMessages');const msgs=contacts[GLOBAL_ID].messages;let html='';msgs.forEach(msg=>{if(msg.system){html+=`<div class="msg-sys">${escapeHtml(msg.text)}</div>`;}else{const isMine=msg.senderId===myId;const row=`<div class="msg-row ${isMine?'sent-global':'received'}"><div class="msg-bubble" style="max-width:90%;font-size:12px;padding:8px 12px">${!isMine?`<div class="msg-sender" style="color:${msg.senderColor||'var(--accent)'}">${escapeHtml(msg.senderName)}</div>`:''}<div>${escapeHtml(msg.text)}</div><div class="msg-time">${formatTime(msg.time)}</div></div></div>`;html+=row;}});area.innerHTML=html;requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight;});}
+function renderMessages(){if(!activeChat)return;const area=$('messagesArea');const c=contacts[activeChat];if(!c)return;let html='';c.messages.forEach(m=>{if(m.isSys){html+=`<div class="msg-sys">${escapeHtml(m.text)}</div>`;return;}const isSent=m.senderId===myId;const cls=isSent?(c.isGlobal?'sent sent-global':'sent'):'received';html+=`<div class="msg-row ${cls}"><div class="msg-bubble">${!isSent?`<div class="msg-sender" style="color:${m.senderColor||'var(--text-muted)'}">${escapeHtml(m.senderName)}</div>`:''}<div>${escapeHtml(m.text)}</div><div class="msg-time">${formatTime(m.time)}</div></div></div>`;});area.innerHTML=html;area.scrollTop=area.scrollHeight;}
 
-function sendNobarMsg(){const input=$('nobarInput');const text=input.value.trim();if(!text)return;sendGlobalMessage(text);input.value='';renderNobarMessages();}
+function renderNobarMessages(){ensureGlobalContact();const area=$('nobarMessages');const c=contacts[GLOBAL_ID];const msgs=c.messages.slice(-50);let html='';msgs.forEach(m=>{const isSent=m.senderId===myId;const cls=isSent?'sent sent-global':'received';html+=`<div class="msg-row ${cls}" style="margin-bottom:2px"><div class="msg-bubble" style="padding:6px 10px; font-size:12px; border-radius:10px">${!isSent?`<span style="color:${m.senderColor||'var(--text-muted)'}; font-weight:600; font-size:10px">${escapeHtml(m.senderName)}</span> `:''}${escapeHtml(m.text)}</div></div>`;});area.innerHTML=html;area.scrollTop=area.scrollHeight;}
 
-function openChat(peerId){activeChat=peerId;ensureGlobalContact();const c=contacts[peerId];if(!c)return;c.unread=0;renderContacts();$('emptyState').style.display='none';$('chatHeader').style.display='flex';$('tabBar').style.display='flex';const isGlobal=peerId===GLOBAL_ID;$('chatAvatar').style.background=isGlobal?'rgba(6,182,212,0.2)':c.color;$('chatAvatar').innerHTML=isGlobal?'<i class="fa-solid fa-globe" style="font-size:14px; color:var(--global-color)"></i>':getInitial(c.name);$('chatAvatar').style.color=isGlobal?'var(--global-color)':'#fff';$('chatName').innerHTML=isGlobal?'<i class="fa-solid fa-globe" style="color:var(--global-color); font-size:12px"></i> Global Chat':'<i class="fa-solid fa-lock" style="color:var(--accent); font-size:10px"></i> '+escapeHtml(c.name);updateChatStatus();$('relayBanner').style.display=isGlobal?'flex':'none';$('tabBar').style.display=isGlobal?'flex':'none';const actions=$('chatActions');if(!isGlobal){actions.innerHTML='<button class="btn-icon" id="btnEndChat" title="Akhiri koneksi"><i class="fa-solid fa-right-from-bracket"></i></button>';document.getElementById('btnEndChat').addEventListener('click',endChat);}else{actions.innerHTML='';}
-if(isGlobal){switchTab(activeTab);}else{$('messagesArea').style.display='flex';$('inputArea').style.display='flex';$('nobarContainer').style.display='none';$('videoContainer').style.display='none';$('tabBar').style.display='none';renderMessages();}
- $('btnSend').className='btn-send'+(isGlobal?' global-mode':'');$('msgInput').className='msg-input'+(isGlobal?' global-mode':'');$('msgInput').placeholder=isGlobal?'Ketik pesan untuk semua orang...':'Ketik pesan privat...';if(isMobile){$('sidebar').classList.add('slide-out');$('chatArea').classList.add('slide-in');}}
+function sendPM(peerId,text){if(contacts[peerId]&&contacts[peerId].connection){contacts[peerId].connection.send({type:'pm',senderId:myId,senderName:myName,text,time:Date.now()});contacts[peerId].messages.push({senderId:myId,senderName:myName,text,time:Date.now()});renderMessages();saveLocalData();}else{showToast('Peer terputus.','error');}}
+function receivePM(peerId,data){if(!contacts[peerId])addOrUpdateContact(peerId,peerId,null);contacts[peerId].messages.push({senderId:data.senderId,senderName:data.senderName,text:data.text,time:data.time});if(activeChat===peerId&&activeTab==='chat')renderMessages();else contacts[peerId].unread++;renderContacts();playNotif();saveLocalData();}
 
-function closeChatMobile(){$('sidebar').classList.remove('slide-out');$('chatArea').classList.remove('slide-in');}
-function updateChatStatus(){if(!activeChat)return;const isGlobal=activeChat===GLOBAL_ID;if(isGlobal){$('chatStatus').innerHTML=`<span style="color:var(--global-color)"><i class="fa-solid fa-users" style="font-size:9px;margin-right:3px"></i>${globalOnlineCount} orang online</span>`;}else{const c=contacts[activeChat];const isOnline=!!(c&&c.connection);$('chatStatus').innerHTML=isOnline?'<span style="color:var(--accent)"><i class="fa-solid fa-circle" style="font-size:5px;margin-right:3px"></i>Terhubung P2P</span>':'<span style="color:var(--danger)"><i class="fa-solid fa-circle" style="font-size:5px;margin-right:3px"></i>Offline</span>';}}
+function sendMessage(){const text=$('msgInput').value.trim();if(!text||!activeChat)return;if(activeChat===GLOBAL_ID){sendGlobalMessage(text);}else{sendPM(activeChat,text);}contacts[activeChat].messages.push();$('msgInput').value='';$('msgInput').style.height='auto';renderMessages();saveLocalData();}
+function sendNobarMsg(){const text=$('nobarInput').value.trim();if(!text)return;sendGlobalMessage(text);$('nobarInput').value='';renderNobarMessages();}
 
-function renderMessages(){if(!activeChat||!contacts[activeChat])return;const c=contacts[activeChat];const area=$('messagesArea');area.innerHTML='';const isGlobal=activeChat===GLOBAL_ID;c.messages.forEach(msg=>{if(msg.system){const d=document.createElement('div');d.className='msg-sys';d.textContent=msg.text;area.appendChild(d);}else{const row=document.createElement('div');const isMine=msg.senderId===myId;row.className='msg-row '+(isMine?(isGlobal?'sent-global':'sent'):'received');const bubble=document.createElement('div');bubble.className='msg-bubble';let html='';if(!isMine)html+=`<div class="msg-sender" style="color:${msg.senderColor||'var(--accent)'}">${escapeHtml(msg.senderName)}</div>`;html+=`<div>${escapeHtml(msg.text)}</div>`;html+=`<div class="msg-time">${formatTime(msg.time)}</div>`;bubble.innerHTML=html;row.appendChild(bubble);area.appendChild(row);}});requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight;});}
+function openChat(id){activeChat=id;const c=contacts[id];if(c)c.unread=0;if(isMobile){$('sidebar').classList.add('slide-out');$('chatArea').classList.add('slide-in');}$('emptyState').style.display='none';$('chatHeader').style.display='flex';$('tabBar').style.display='flex';$('chatAvatar').textContent=getInitial(c.name);$('chatAvatar').style.background=c.isGlobal?'rgba(6,182,212,0.2)':c.color;$('chatAvatar').style.color=c.isGlobal?'var(--global-color)':'#fff';$('chatName').innerHTML=c.isGlobal?`<i class="fa-solid fa-globe" style="color:var(--global-color);font-size:12px"></i> ${escapeHtml(c.name)}`:escapeHtml(c.name);updateChatStatus();$('msgInput').className='msg-input'+(c.isGlobal?' global-mode':'');$('btnSend').className='btn-send'+(c.isGlobal?' global-mode':'');$('msgInput').placeholder=c.isGlobal?'Ketik pesan global...':'Ketik pesan privat...';if(c.isGlobal){$('relayBanner').style.display='flex';$('relayInfo').textContent=`${globalOnlineCount} user online · Firebase Relay`;}else{$('relayBanner').style.display='none';}switchTab('chat');renderContacts();}
 
-function sendMessage(){const input=$('msgInput');const text=input.value.trim();if(!text||!activeChat)return;const isGlobal=activeChat===GLOBAL_ID;if(isGlobal){sendGlobalMessage(text);}else{const c=contacts[activeChat];if(!c)return;const time=Date.now();const msg={senderId:myId,senderName:myName,text,time};c.messages.push({...msg});if(c.connection){c.connection.send({type:'pm',senderId:myId,senderName:myName,text,time});}else{showToast('Kontak offline.','info');}saveLocalData();}input.value='';input.style.height='auto';renderMessages();renderContacts();}
-function receivePM(peerId,data){const c=contacts[peerId];if(!c)return;c.messages.push({senderId:data.senderId,senderName:data.senderName,text:data.text,time:data.time||Date.now()});if(activeChat===peerId)renderMessages();else c.unread++;renderContacts();playNotif();saveLocalData();}
-function endChat(){if(!activeChat||activeChat===GLOBAL_ID)return;const c=contacts[activeChat];if(c&&c.connection){c.connection.close();c.connection=null;}updateChatStatus();renderContacts();}
+function updateChatStatus(){if(!activeChat)return;const c=contacts[activeChat];if(!c)return;if(c.isGlobal){$('chatStatus').innerHTML=`<span class="status-dot connected"></span>${globalOnlineCount} online · Relay Aktif`;}else if(c.connection){$('chatStatus').innerHTML=`<span class="status-dot connected"></span>Terhubung P2P`;}else{$('chatStatus').innerHTML=`<span class="status-dot disconnected"></span>Offline / Terputus`;}}
 
-document.addEventListener('DOMContentLoaded',()=>{
-    loadBackground();
-    const savedData=loadLocalData();
-    if(savedData && savedData.myId && savedData.myName){
-        myId=savedData.myId; myName=savedData.myName; myColor=savedData.myColor;
-        if(savedData.contacts){Object.keys(savedData.contacts).forEach(id=>{contacts[id]=savedData.contacts[id];contacts[id].connection=null;});}
-        if(savedData.globalMsgCache){savedData.globalMsgCache.forEach(m=>globalMsgCache.add(m));}
-        initPeer(myId); $('myAvatar').textContent=getInitial(myName); $('myNameDisplay').textContent=myName; $('myIdSmall').textContent=myId;
-        $('entrance').classList.add('hidden'); $('chatApp').classList.add('active'); ensureGlobalContact(); renderContacts(); initFirebase();
-    } else { initPeer(); }
+function showAddModal(){$('addModal').classList.add('show');$('targetIdInput').value='';$('targetNameInput').value='';}
+function hideAddModal(){$('addModal').classList.remove('show');}
+function showBgModal(){const c=$('bgOptions');c.innerHTML='';BG_COLORS.forEach(cl=>{const b=document.createElement('div');b.className='bg-color-btn';b.style.background=cl;b.onclick=()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor=cl;saveBackground();};c.appendChild(b);});$('bgModal').classList.add('show');}
+function hideBgModal(){$('bgModal').classList.remove('show');}
 
-    $('usernameInput').addEventListener('input',()=>{$('btnJoin').disabled=!$('usernameInput').value.trim();});
-    $('btnJoin').addEventListener('click',()=>{
-        myName=$('usernameInput').value.trim(); if(!myName)return;
-        $('myAvatar').textContent=getInitial(myName); $('myNameDisplay').textContent=myName; $('myIdSmall').textContent=myId;
-        $('entrance').classList.add('hidden'); $('chatApp').classList.add('active'); ensureGlobalContact(); renderContacts(); initFirebase(); saveLocalData();
-    });
-    $('btnLogout').addEventListener('click',()=>{ if(confirm('Keluar dari akun?')){ if(myPeer&&!myPeer.destroyed)myPeer.destroy(); if(onlineRef)onlineRef.remove(); localStorage.removeItem('p2pChatData'); location.reload(); }});
+let adminLoggedIn=false;
+function showAdminModal(){$('adminModal').classList.add('show');if(adminLoggedIn){$('adminLoginArea').style.display='none';$('adminActionsArea').style.display='block';}else{$('adminLoginArea').style.display='block';$('adminActionsArea').style.display='none';}$('adminPassInput').value='';}
+function hideAdminModal(){$('adminModal').classList.remove('show');}
 
-    $('btnCopyId').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
-    $('btnCopyId2').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
-    $('myIdSmall').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
-    $('btnAddContact').addEventListener('click',()=>{$('addModal').classList.add('show');});
-    $('modalClose').addEventListener('click',()=>{$('addModal').classList.remove('show');});
-    $('btnConnect').addEventListener('click',()=>{const tid=$('targetIdInput').value.trim();const tn=$('targetNameInput').value.trim();if(!tid){showToast('Masukkan ID!','error');return;}connectToPeer(tid,tn);$('addModal').classList.remove('show');$('targetIdInput').value='';$('targetNameInput').value='';});
+ $('usernameInput').addEventListener('input',()=>{$('btnJoin').disabled=!$('usernameInput').value.trim();});
+ $('btnJoin').addEventListener('click',()=>{myName=$('usernameInput').value.trim();if(!myName)return;$('myAvatar').textContent=getInitial(myName);$('myNameDisplay').textContent=myName;$('myIdSmall').textContent=myId;$('entrance').classList.add('hidden');setTimeout(()=>{$('entrance').style.display='none';},600);$('chatApp').classList.add('active');initFirebase();renderContacts();openChat(GLOBAL_ID);});
+ $('btnCopyId').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
+ $('btnCopyId2').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
+ $('myIdSmall').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
+ $('btnAddContact').addEventListener('click',showAddModal);
+ $('modalClose').addEventListener('click',hideAddModal);
+ $('btnConnect').addEventListener('click',()=>{const tid=$('targetIdInput').value.trim();const tn=$('targetNameInput').value.trim();if(!tid){showToast('Masukkan ID teman!','error');return;}connectToPeer(tid,tn);hideAddModal();});
+ $('btnBgSettings').addEventListener('click',showBgModal);
+ $('bgModalClose').addEventListener('click',hideBgModal);
+ $('uploadArea').addEventListener('click',()=>$('fileInput').click());
+ $('fileInput').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{$('wallpaper').style.backgroundImage=`url(${ev.target.result})`;saveBackground();showToast('Background diubah!','success');};reader.readAsDataURL(file);});
+ $('btnResetBg').addEventListener('click',()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor='var(--bg-deep)';saveBackground();showToast('Background direset.','info');});
+ $('btnAdmin').addEventListener('click',showAdminModal);
+ $('adminModalClose').addEventListener('click',hideAdminModal);
 
-    $('searchInput').addEventListener('input',renderContacts);
-    $('btnSend').addEventListener('click',sendMessage);
-    $('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
-    $('msgInput').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
-    $('btnMobileBack').addEventListener('click',closeChatMobile);
+ $('btnAdminLogin').addEventListener('click',()=>{const pass=$('adminPassInput').value;if(pass==='admin123'){adminLoggedIn=true;$('adminLoginArea').style.display='none';$('adminActionsArea').style.display='block';showToast('Login admin berhasil!','success');}else{showToast('Password salah!','error');}});
+ $('btnClearGlobal').addEventListener('click',()=>{if(!adminLoggedIn)return;firebase.database().ref('globalChat').remove();firebase.database().ref('lastGlobalMsg').remove();if(contacts[GLOBAL_ID])contacts[GLOBAL_ID].messages=[];renderMessages();showToast('Chat global dihapus!','success');});
+ $('btnClearOnline').addEventListener('click',()=>{if(!adminLoggedIn)return;firebase.database().ref('onlineUsers').remove();showToast('Data online dibersihkan!','success');});
+ $('btnClearVideos').addEventListener('click',()=>{if(!adminLoggedIn)return;firebase.database().ref('videos').remove();videoList=[];renderVideos();showToast('Semua video dihapus!','success');});
 
-    $('btnBgSettings').addEventListener('click',()=>{$('bgModal').classList.add('show');});
-    $('bgModalClose').addEventListener('click',()=>{$('bgModal').classList.remove('show');});
-    const bgGrid=$('bgOptions');BG_COLORS.forEach(c=>{const btn=document.createElement('div');btn.className='bg-color-btn';btn.style.background=c;btn.onclick=()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor=c;saveBackground();};bgGrid.appendChild(btn);});
-    $('uploadArea').addEventListener('click',()=>$('fileInput').click());
-    $('fileInput').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{$('wallpaper').style.backgroundImage=`url('${ev.target.result}')`;saveBackground();};reader.readAsDataURL(file);});
-    $('btnResetBg').addEventListener('click',()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor='';localStorage.removeItem('p2pChatBg');});
+ $('tabVidYoutube').addEventListener('click',()=>{$('youtubeUploadArea').style.display='block';$('customUploadArea').style.display='none';$('liveTvUploadArea').style.display='none';$('tabVidYoutube').style.borderColor='var(--danger)';$('tabVidYoutube').style.color='var(--danger)';$('tabVidCustom').style.borderColor='var(--border)';$('tabVidCustom').style.color='var(--text-muted)';$('tabVidLive').style.borderColor='var(--border)';$('tabVidLive').style.color='var(--text-muted)';});
+ $('tabVidCustom').addEventListener('click',()=>{$('youtubeUploadArea').style.display='none';$('customUploadArea').style.display='block';$('liveTvUploadArea').style.display='none';$('tabVidCustom').style.borderColor='var(--accent2)';$('tabVidCustom').style.color='var(--accent2)';$('tabVidYoutube').style.borderColor='var(--border)';$('tabVidYoutube').style.color='var(--text-muted)';$('tabVidLive').style.borderColor='var(--border)';$('tabVidLive').style.color='var(--text-muted)';});
+ $('tabVidLive').addEventListener('click',()=>{$('youtubeUploadArea').style.display='none';$('customUploadArea').style.display='none';$('liveTvUploadArea').style.display='block';$('tabVidLive').style.borderColor='var(--accent)';$('tabVidLive').style.color='var(--accent)';$('tabVidYoutube').style.borderColor='var(--border)';$('tabVidYoutube').style.color='var(--text-muted)';$('tabVidCustom').style.borderColor='var(--border)';$('tabVidCustom').style.color='var(--text-muted)';});
 
-    let isAdmin=false;
-    $('btnAdmin').addEventListener('click',()=>{$('adminModal').classList.add('show');if(isAdmin)$('adminLoginArea').style.display='none';$('adminActionsArea').style.display=isAdmin?'block':'none';});
-    $('adminModalClose').addEventListener('click',()=>{$('adminModal').classList.remove('show');});
-    $('btnAdminLogin').addEventListener('click',()=>{const pass=$('adminPassInput').value;if(pass==='admin123'){isAdmin=true;$('adminLoginArea').style.display='none';$('adminActionsArea').style.display='block';showToast('Login Admin berhasil!','success');}else{showToast('Password salah!','error');}});
+ $('btnPostYt').addEventListener('click',()=>{const link=$('ytLinkInput').value.trim();const title=$('ytTitleInput').value.trim()||'YouTube Video';if(!link){showToast('Masukkan link YouTube!','error');return;}let vid='';try{const u=new URL(link);vid=u.searchParams.get('v')||u.pathname.split('/').pop();}catch(e){vid=link.includes('youtu')?link.split('v=')[1]?.split('&')[0]:link;}if(!vid){showToast('Link YouTube tidak valid!','error');return;}firebase.database().ref('videos').push({embedSrc:`https://www.youtube.com/embed/${vid}`,title,time:firebase.database.ServerValue.TIMESTAMP,isLive:false});$('ytLinkInput').value='';$('ytTitleInput').value='';showToast('YouTube video diposting!','success');});
+
+// FUNGSI UPLOAD EMBED CODE (Extrak link dari IFRAME)
+ $('btnPostCustom').addEventListener('click', () => {
+    const rawEmbedCode = $('customLinkInput').value.trim();
+    const title = $('customTitleInput').value.trim() || 'Video Embed';
     
-    const resetAdminTabs=()=>{$('youtubeUploadArea').style.display='none';$('customUploadArea').style.display='none';$('liveTvUploadArea').style.display='none';$('tabVidYoutube').style.borderColor='var(--border)';$('tabVidYoutube').style.color='var(--text-muted)';$('tabVidCustom').style.borderColor='var(--border)';$('tabVidCustom').style.color='var(--text-muted)';$('tabVidLive').style.borderColor='var(--border)';$('tabVidLive').style.color='var(--text-muted)';};
-    $('tabVidYoutube').addEventListener('click',()=>{resetAdminTabs();$('youtubeUploadArea').style.display='block';$('tabVidYoutube').style.borderColor='var(--danger)';$('tabVidYoutube').style.color='var(--danger)';});
-    $('tabVidCustom').addEventListener('click',()=>{resetAdminTabs();$('customUploadArea').style.display='block';$('tabVidCustom').style.borderColor='var(--danger)';$('tabVidCustom').style.color='var(--danger)';});
-    $('tabVidLive').addEventListener('click',()=>{resetAdminTabs();$('liveTvUploadArea').style.display='block';$('tabVidLive').style.borderColor='var(--accent)';$('tabVidLive').style.color='var(--accent)';});
+    if(!rawEmbedCode) {
+        showToast('Masukkan embed code!','error');
+        return;
+    }
 
-    function getYTEmbed(url){const r=url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?#]+)/);return r?`https://www.youtube.com/embed/${r[1]}`:null;}
+    let embedSrc = '';
+    
+    // Cek apakah input adalah full embed code (mengandung <iframe)
+    if(rawEmbedCode.toLowerCase().includes('<iframe') && rawEmbedCode.toLowerCase().includes('src=')) {
+        // Extract link dari dalam atribut SRC
+        const match = rawEmbedCode.match(/src\s*=\s*["']([^"']+)["']/i);
+        if(match && match[1]) {
+            embedSrc = match[1];
+        } else {
+            showToast('Gagal membaca link SRC dari embed code.','error');
+            return;
+        }
+    } else {
+        // Jika user hanya mempaste link langsung
+        embedSrc = rawEmbedCode;
+    }
 
-    $('btnPostYt').addEventListener('click',()=>{const link=$('ytLinkInput').value.trim();const title=$('ytTitleInput').value.trim()||'YouTube Video';if(!link){showToast('Masukkan link!','error');return;}const embed=getYTEmbed(link);if(!embed){showToast('Link YouTube tidak valid!','error');return;}firebase.database().ref('videos').push({embedSrc:embed,title,time:firebase.database.ServerValue.TIMESTAMP,poster:myName,isLive:false});showToast('Video berhasil diposting!','success');$('ytLinkInput').value='';$('ytTitleInput').value='';});
-    $('btnPostCustom').addEventListener('click',()=>{const link=$('customLinkInput').value.trim();const title=$('customTitleInput').value.trim()||'Custom Video';let embed='';if(link){embed=link;}if(!embed){showToast('Masukkan link!','error');return;}firebase.database().ref('videos').push({embedSrc:embed,title,time:firebase.database.ServerValue.TIMESTAMP,poster:myName,isLive:false});showToast('Video berhasil diposting!','success');$('customLinkInput').value='';$('customTitleInput').value='';});
-    $('btnPostM3u').addEventListener('click',()=>{const link=$('m3uLinkInput').value.trim();const title=$('m3uTitleInput').value.trim()||'Live TV';if(!link){showToast('Masukkan link M3U8!','error');return;}firebase.database().ref('videos').push({embedSrc:link,title,time:firebase.database.ServerValue.TIMESTAMP,poster:myName,isLive:true});showToast('Live TV berhasil diposting!','success');$('m3uLinkInput').value='';$('m3uTitleInput').value='';});
+    if(!embedSrc.startsWith('http')) {
+        showToast('Link video tidak valid!','error');
+        return;
+    }
 
-    $('btnClearGlobal').addEventListener('click',()=>{if(confirm('Hapus semua chat global?')){firebase.database().ref('globalChat').remove();firebase.database().ref('lastGlobalMsg').remove();if(contacts[GLOBAL_ID])contacts[GLOBAL_ID].messages=[];globalMsgCache.clear();renderMessages();renderNobarMessages();saveLocalData();showToast('Chat global dibersihkan!','success');}});
-    $('btnClearOnline').addEventListener('click',()=>{if(confirm('Bersihkan data online?')){firebase.database().ref('onlineUsers').remove();showToast('Data online dibersihkan!','success');}});
-    $('btnClearVideos').addEventListener('click',()=>{if(confirm('Hapus semua video & TV?')){firebase.database().ref('videos').remove();showToast('Video dihapus!','success');}});
-    $('btnChangeAdminPass').addEventListener('click',()=>{showToast('Fitur ganti password hanya contoh (simpan ke DB untuk real).','info');});
+    // Push ke Firebase
+    firebase.database().ref('videos').push({
+        embedSrc: embedSrc,
+        title: title,
+        time: firebase.database.ServerValue.TIMESTAMP,
+        isLive: false
+    });
 
-    const nobarMsgArea=$('nobarMessages');
-    nobarMsgArea.addEventListener('touchmove',(e)=>{e.stopPropagation();},{passive:true});
+    $('customLinkInput').value = '';
+    $('customTitleInput').value = '';
+    showToast('Video embed berhasil diposting!','success');
 });
+
+ $('btnPostM3u').addEventListener('click',()=>{const link=$('m3uLinkInput').value.trim();const title=$('m3uTitleInput').value.trim()||'Live TV';if(!link){showToast('Masukkan link M3U8!','error');return;}firebase.database().ref('videos').push({embedSrc:link,title,time:firebase.database.ServerValue.TIMESTAMP,isLive:true});$('m3uLinkInput').value='';$('m3uTitleInput').value='';showToast('Live TV diposting!','success');});
+
+ $('btnChangeAdminPass').addEventListener('click',()=>{showToast('Fitur ganti password simpan di client.','info');});
+
+ $('btnLogout').addEventListener('click',()=>{if(myPeer&&!myPeer.destroyed)myPeer.destroy();if(onlineRef)onlineRef.remove();localStorage.removeItem('p2pChatData');location.reload();});
+ $('btnMobileBack').addEventListener('click',()=>{$('sidebar').classList.remove('slide-out');$('chatArea').classList.remove('slide-in');});
+
+ $('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+ $('msgInput').addEventListener('input',()=>{$('msgInput').style.height='auto';$('msgInput').style.height=Math.min($('msgInput').scrollHeight,100)+'px';});
+ $('btnSend').addEventListener('click',sendMessage);
+ $('searchInput').addEventListener('input',renderContacts);
+
+window.addEventListener('beforeunload',()=>{if(onlineRef)onlineRef.remove();});
+
+const savedData=loadLocalData();
+if(savedData&&savedData.myId&&savedData.myName){myId=savedData.myId;myName=savedData.myName;myColor=savedData.myColor||getColorFor(myId);if(savedData.contacts)Object.keys(savedData.contacts).forEach(id=>{contacts[id]=savedData.contacts[id];contacts[id].connection=null;});if(savedData.globalMsgCache)savedData.globalMsgCache.forEach(m=>globalMsgCache.add(m));initPeer(myId);$('usernameInput').value=myName;$('btnJoin').disabled=false;}else{initPeer();}
+loadBackground();
 </script>
 </body>
 </html>
