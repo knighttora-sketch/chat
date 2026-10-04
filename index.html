@@ -214,7 +214,7 @@
                 <div class="nobar-chat-side">
                     <div class="nobar-chat-messages" id="nobarMessages"></div>
                     <div class="nobar-chat-input">
-                        <input type="text" id="BobarInput" placeholder="Ketik chat nobar..." onkeydown="if(event.key==='Enter')sendNobarMsg()">
+                        <input type="text" id="nobarInput" placeholder="Ketik chat nobar..." onkeydown="if(event.key==='Enter')sendNobarMsg()">
                         <button onclick="sendNobarMsg()"><i class="fa-solid fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -258,7 +258,7 @@
     
     <div id="embedUploadArea" style="display:none;">
         <div class="input-group"><label>Paste Embed Code (IFRAME)</label><textarea id="embedCodeInput" class="input-field" rows="4" placeholder='<IFRAME SRC="https://morencius.com/embed/xxx" WIDTH=640 HEIGHT=360></IFRAME>' style="font-family:'JetBrains Mono',monospace; font-size:11px;"></textarea></div>
-        <div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="embedTitleInput" class="input4-field" placeholder="Contoh: Film Episode 1"></div>
+        <div class="input-group" style="margin-bottom:8px;"><label>Judul Video (opsional)</label><input type="text" id="embedTitleInput" class="input-field" placeholder="Contoh: Film Episode 1"></div>
         <button class="btn-modal" id="btnPostEmbed" style="background:linear-gradient(135deg, var(--accent2), #d97706)"><i class="fa-solid fa-code"></i> Post Embed Video</button>
     </div>
 
@@ -313,7 +313,8 @@ function escapeHtml(str){const d=document.createElement('div');d.textContent=str
 function showToast(msg,type='info'){const t=document.createElement('div');t.className='toast '+type;const icons={success:'fa-circle-check',error:'fa-circle-xmark',info:'fa-circle-info'};t.innerHTML=`<i class="fa-solid ${icons[type]||icons.info}"></i> ${msg}`;$('toastContainer').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3500);}
 function setStatus(state,text){$('statusDot').className='status-dot '+state;$('statusText').textContent=text;}
 
-function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.database();dbRef=db.ref('globalChat');dbRef.orderByChild('time').limitToLast(1).on('child_added',snap=>{const data=snap.val();if(data&&data.msgId&&!globalMsgCache.has(data.msgId)){globalMsgCache.add(data.msgId);if(data.senderId!==myId){ensureGlobalContact();contacts[GLOBAL_ID].messages.push({senderId:data.senderId,senderName:data.senderName,senderColor:data.senderColor,text:data.text,time:data.time});if(activeChat===GLOBAL_ID&&activeTab==='chat')renderMessages();else if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarMessages();else contacts[GLOBAL_ID].unread++;renderContacts();saveLocalData();}}});const presenceRef=db.ref('.info/connected');onlineRef=db.ref('onlineUsers/'+myId);presenceRef.on('value',snap=>{if(snap.val()===true){onlineRef.onDisconnect().remove();onlineRef.set({name:myName,color:myColor,lastSeen:firebase.database.ServerValue.TIMESTAMP});}});db.ref('onlineUsers').on('value',snap=>{const data=snap.val()||{};globalOnlineCount=Object.keys(data).length;if(activeChat===GLOBAL_ID)updateChatStatus();renderContacts();});db.ref('videos').on('value',snap=>{const data=snap.val()||[];videoList=Object.values(data).sort((a,b)=>b.time-a.time);if(activeChat===GLOBAL_ID&&activeTab==='video')renderVideos();if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarVideos();});db.ref('webviews').on('value',snap=>{const data=snap.val()||{};webList=Object.entries(data).map(([id,val])=>({id,...val}));renderContacts();renderAdminWebList();});initNobarSync(db);setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
+// PERBAIKAN REAL-TIME: Gunakan child_added untuk tangkap setiap pesan baru, tanpa limitToLast
+function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.database();dbRef=db.ref('globalChat');dbRef.on('child_added',snap=>{const data=snap.val();if(data&&data.msgId&&!globalMsgCache.has(data.msgId)){globalMsgCache.add(data.msgId);if(data.senderId!==myId){ensureGlobalContact();contacts[GLOBAL_ID].messages.push({senderId:data.senderId,senderName:data.senderName,senderColor:data.senderColor,text:data.text,time:data.time});if(activeChat===GLOBAL_ID&&activeTab==='chat')renderMessages();else if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarMessages();else contacts[GLOBAL_ID].unread++;renderContacts();saveLocalData();}}});const presenceRef=db.ref('.info/connected');onlineRef=db.ref('onlineUsers/'+myId);presenceRef.on('value',snap=>{if(snap.val()===true){onlineRef.onDisconnect().remove();onlineRef.set({name:myName,color:myColor,lastSeen:firebase.database.ServerValue.TIMESTAMP});}});db.ref('onlineUsers').on('value',snap=>{const data=snap.val()||{};globalOnlineCount=Object.keys(data).length;if(activeChat===GLOBAL_ID)updateChatStatus();renderContacts();});db.ref('videos').on('value',snap=>{const data=snap.val()||[];videoList=Object.values(data).sort((a,b)=>b.time-a.time);if(activeChat===GLOBAL_ID&&activeTab==='video')renderVideos();if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarVideos();});db.ref('webviews').on('value',snap=>{const data=snap.val()||{};webList=Object.entries(data).map(([id,val])=>({id,...val}));renderContacts();renderAdminWebList();});initNobarSync(db);setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
 
 function sendGlobalMessage(text){if(!dbRef)return;const time=Date.now();const msgId=myId+'-'+time+'-'+Math.random();ensureGlobalContact();const msgData={msgId,senderId:myId,senderName:myName,senderColor:myColor,text,time};contacts[GLOBAL_ID].messages.push({...msgData});globalMsgCache.add(msgId);dbRef.push().set(msgData);saveLocalData();}
 
@@ -387,7 +388,7 @@ document.getElementById('tabVidEmbed').onclick = () => {
     document.getElementById('customUploadArea').style.display = 'none';
     document.getElementById('liveTvUploadArea').style.display = 'none';
     document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)'; document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidEmbed').style.borderColor = 'var(--accent2)'; document.getElementById('tabVidEmbed').style.color = 'var(--accent2)';
+    document.getElementById5('tabVidEmbed').style.borderColor = 'var(--accent2)'; document.getElementById('tabVidEmbed').style.color = 'var(--accent2)';
     document.getElementById('tabVidCustom').style.borderColor = 'var(--border)'; document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
     document.getElementById('tabVidLive').style.borderColor = 'var(--border)'; document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
 };
