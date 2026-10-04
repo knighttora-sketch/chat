@@ -103,9 +103,6 @@
         .nobar-main-player iframe, .nobar-main-player video { width:100%; height:100%; border:0; position:absolute; inset:0; background:#000; }
         .nobar-main-player .nobar-empty { color:var(--text-muted); text-align:center; z-index:2; }
         .nobar-main-player .nobar-empty i { font-size:48px; margin-bottom:12px; opacity:0.3; display:block; }
-        .custom-play-btn { position:absolute; z-index:5; width:70px; height:70px; border-radius:50%; background:rgba(245,158,11,0.9); border:none; color:#fff; font-size:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(245,158,11,0.5); transition: transform 0.2s, background 0.2s; }
-        .custom-play-btn:hover { transform:scale(1.1); background:var(--accent2); }
-        .custom-play-btn i { margin-left:4px; } 
 
         .nobar-thumb-list { height:100px; overflow-x:auto; overflow-y:hidden; display:flex; gap:8px; padding:8px; background:rgba(6,10,19,0.9); border-top:1px solid var(--border); align-items:center; flex-shrink: 0; }
         .nobar-thumb-card { width:120px; flex-shrink:0; cursor:pointer; border:2px solid transparent; border-radius:6px; overflow:hidden; transition: border-color 0.2s, transform 0.2s; position:relative; background:var(--bg-card); }
@@ -130,7 +127,7 @@
         .messages-area { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:6px; z-index:1; position:relative; }
         .msg-row { display:flex; align-items:flex-end; gap:6px; } .msg-row.sent { flex-direction:row-reverse; } .msg-bubble { max-width:80%; padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.4; position:relative; word-break:break-word; }
         .msg-row.received .msg-bubble { background:rgba(17,26,46,0.9); border:1px solid var(--border); border-bottom-left-radius:4px; } .msg-row.sent .msg-bubble { background: linear-gradient(135deg, rgba(13,61,48,0.95), rgba(10,46,36,0.95)); border:1px solid rgba(16,185,129,0.2); border-bottom-right-radius:4px; } .msg-row.sent-global .msg-bubble { background: linear-gradient(135deg, rgba(12,45,61,0.95), rgba(10,36,48,0.95)); border:1px solid rgba(6,182,212,0.2); border-bottom-right-radius:4px; }
-        .msg-sender { font-size:10px; font-weight:600; margin-bottom:3px; } .msg-time { font-size:9px; color:var(--text-muted); margin-top:3px; opacity:0.7; } .msg-sys { text-align:center; font-size:11px; color:var(--text-muted); padding:6px 0; font-style:italic; }
+        .msg-sender { font-size:10px; font-weight:600; margin-bottom:3px; } .msg-time { font-size:9px; color:var(--text-muted); margin-top:3px; opacity:0.7; }
 
         .input-area { padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; align-items:flex-end; background:rgba(12,18,32,0.9); backdrop-filter:blur(12px); z-index:2; }
         .msg-input { flex:1; padding:10px 14px; font-size:13px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; color:var(--text); font-family:'Space Grotesk',sans-serif; outline:none; resize:none; max-height:100px; min-height:40px; transition: border-color 0.3s; }
@@ -274,7 +271,7 @@
     <div id="liveTvUploadArea" style="display:none;">
         <div class="input-group"><label>Link M3U8 / M3U (HLS Stream)</label><input type="text" id="m3uLinkInput" class="input-field" placeholder="Contoh: https://example.com/live/stream.m3u8"></div>
         <div class="input-group" style="margin-bottom:8px;"><label>Nama Channel TV</label><input type="text" id="m3uTitleInput" class="input-field" placeholder="Contoh: RCTI, SCTV, dll"></div>
-        <button class="btn-modal" id="btnPostM3u" style="background:linear-gradient(135deg, var(--accent), #059669)"><i class="fa-solid fa-tower-broadcast"></i> Post Live TV</button>
+        <button class="btn-modal" id="btnPostM3u" style="background:linear-gradient(135deg, var(--accent), #059669)"><i class="fa-solid fa-tower-broadcast"></i>4 Post Live TV</button>
     </div>
     </div>
     
@@ -289,13 +286,15 @@ const ID_PREFIX='p2pch-',AVATAR_COLORS=['#10b981','#f59e0b','#ef4444','#8b5cf6',
 
 let myPeer=null,myId=null,myName='',myColor='',contacts={},activeChat=null,globalMsgCache=new Set(),isMobile=window.innerWidth<=768,dbRef=null,onlineRef=null,globalMsgRef=null,globalOnlineCount=0,videoList=[],webList=[],activeTab='chat',activeNobarVideoSrc=null;
 let isNobarHost=false, currentNobarHostId=null, nobarStateRef=null, nobarSyncInterval=null; 
+let saveTimeout=null; // Optimasi LocalStorage
 
 const $=id=>document.getElementById(id); window.addEventListener('resize',()=>{isMobile=window.innerWidth<=768;});
 
-function saveLocalData(){const d={myId,myName,myColor,globalMsgCache:Array.from(globalMsgCache),contacts:{}};Object.keys(contacts).forEach(id=>{if(contacts[id].messages.length>0)d.contacts[id]={name:contacts[id].name,color:contacts[id].color,isGlobal:contacts[id].isGlobal,isWeb:contacts[id].isWeb,webUrl:contacts[id].webUrl,messages:contacts[id].messages.slice(-100)}});localStorage.setItem('p2pChatData',JSON.stringify(d));}
-function loadLocalData(){try{const r=localStorage.getItem('p2pChatData');if(r){const d=JSON.parse(r);if(d.myId&&d.myName)return d;}}catch(e){}return null;}
+// OPTIMASI: Auto-save tidak blocking, delay 3 detik setelah aktivitas terakhir
+function saveLocalData(){if(saveTimeout)clearTimeout(saveTimeout);saveTimeout=setTimeout(()=>DsaveLocalData,3000);}
+function DsaveLocalData(){const d={myId,myName,myColor,globalMsgCache:Array.from(globalMsgCache),contacts:{}};Object.keys(contacts).forEach(id=>{if(contacts[id].messages.length>0)d.contacts[id]={name:contacts[id].name,color:contacts[id].color,isGlobal:contacts[id].isGlobal,isWeb:contacts[id].isWeb,webUrl:contacts[id].webUrl,messages:contacts[id].messages.slice(-100)}});localStorage.setItem('p2pChatData',JSON.stringify(d));}
 
-// PERBAIKAN BUG: Typo 'p2p9pChatBg' menjadi 'p2pChatBg'
+function loadLocalData(){try{const r=localStorage.getItem('p2pChatData');if(r){const d=JSON.parse(r);if(d.myId&&d.myName)return d;}}catch(e){}return null;}
 function saveBackground(){localStorage.setItem('p2pChatBg',JSON.stringify({image:$('wallpaper').style.backgroundImage||'',color:$('wallpaper').style.backgroundColor||''}));}
 function loadBackground(){try{const r=localStorage.getItem('p2pChatBg');if(r){const d=JSON.parse(r);if(d.image&&d.image!=='none')$('wallpaper').style.backgroundImage=d.image;else if(d.color)$('wallpaper').style.backgroundColor=d.color;}}catch(e){}}
 
@@ -303,13 +302,15 @@ function genId(){const c='abcdefghijklmnopqrstuvwxyz0123456789';let s='';for(let
 function getInitial(n){return(n||'?').charAt(0).toUpperCase();}
 function getColorFor(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];}
 function formatTime(ts){const d=new Date(ts);return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+-0}
 function escapeHtml(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
 function showToast(msg,type='info'){const t=document.createElement('div');t.className='toast '+type;const icons={success:'fa-circle-check',error:'fa-circle-xmark',info:'fa-circle-info'};t.innerHTML=`<i class="fa-solid ${icons[type]||icons.info}"></i> ${msg}`;$('toastContainer').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3500);}
 function setStatus(state,text){$('statusDot').className='status-dot '+state;$('statusText').textContent=text;}
 
-function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.database();dbRef=db.ref('globalChat');globalMsgRef=db.ref('lastGlobalMsg');globalMsgRef.on('value',snap=>{const data=snap.val();if(data&&data.msgId&&!globalMsgCache.has(data.msgId)){globalMsgCache.add(data.msgId);if(data.senderId!==myId){ensureGlobalContact();contacts[GLOBAL_ID].messages.push({senderId:data.senderId,senderName:data.senderName,senderColor:data.senderColor,text:data.text,time:data.time});if(activeChat===GLOBAL_ID&&activeTab==='chat')renderMessages();else if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarMessages();else contacts[GLOBAL_ID].unread++;renderContacts();saveLocalData();}}});const presenceRef=db.ref('.info/connected');onlineRef=db.ref('onlineUsers/'+myId);presenceRef.on('value',snap=>{if(snap.val()===true){onlineRef.onDisconnect().remove();onlineRef.set({name:myName,color:myColor,lastSeen:firebase.database.ServerValue.TIMESTAMP});}});db.ref('onlineUsers').on('value',snap=>{const data=snap.val()||{};globalOnlineCount=Object.keys(data).length;if(activeChat===GLOBAL_ID)updateChatStatus();renderContacts();});db.ref('videos').on('value',snap=>{const data=snap.val()||[];videoList=Object.values(data).sort((a,b)=>b.time-a.time);if(activeChat===GLOBAL_ID&&activeTab==='video')renderVideos();if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarVideos();});db.ref('webviews').on('value',snap=>{const data=snap.val()||{};webList=Object.entries(data).map(([id,val])=>({id,...val}));renderContacts();renderAdminWebList();});initNobarSync(db);setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
+// OPTIMASI: Gunakan child_added daripada value pada lastGlobalMsg agar tidak delay & timpa pesan
+function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.database();dbRef=db.ref('globalChat');dbRef.orderByChild('time').limitToLast(1).on('child_added',snap=>{const data=snap.val();if(data&&data.msgId&&!globalMsgCache.has(data.msgId)){globalMsgCache.add(data.msgId);if(data.senderId!==myId){ensureGlobalContact();contacts[GLOBAL_ID].messages.push({senderId:data.senderId,senderName:data.senderName,senderColor:data.senderColor,text:data.text,time:data.time});if(activeChat===GLOBAL_ID&&activeTab==='chat')renderMessages();else if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarMessages();else contacts[GLOBAL_ID].unread++;renderContacts();saveLocalData();}}});const presenceRef=db.ref('.info/connected');onlineRef=db.ref('onlineUsers/'+myId);presenceRef.on('value',snap=>{if(snap.val()===true){onlineRef.onDisconnect().remove();onlineRef.set({name:myName,color:myColor,lastSeen:firebase.database.ServerValue.TIMESTAMP});}});db.ref('onlineUsers').on('value',snap=>{const data=snap.val()||{};globalOnlineCount=Object.keys(data).length;if(activeChat===GLOBAL_ID)updateChatStatus();renderContacts();});db.ref('videos').on('value',snap=>{const data=snap.val()||[];videoList=Object.values(data).sort((a,b)=>b.time-a.time);if(activeChat===GLOBAL_ID&&activeTab==='video')renderVideos();if(activeChat===GLOBAL_ID&&activeTab==='nobar')renderNobarVideos();});db.ref('webviews').on('value',snap=>{const data=snap.val()||{};webList=Object.entries(data).map(([id,val])=>({id,...val}));renderContacts();renderAdminWebList();});initNobarSync(db);setStatus('connected','Global & P2P Aktif');}catch(e){console.error("Firebase Error:",e);showToast("Gagal koneksi Global.","error");setStatus('connecting','Global Error');}}
 
-function sendGlobalMessage(text){if(!dbRef)return;const time=Date.now();const msgId=myId+'-'+time+'-'+Math.random();ensureGlobalContact();const msgData={msgId,senderId:myId,senderName:myName,senderColor:myColor,text,time};contacts[GLOBAL_ID].messages.push({...msgData});globalMsgCache.add(msgId);dbRef.push().set(msgData);globalMsgRef.set(msgData);saveLocalData();}
+function sendGlobalMessage(text){if(!dbRef)return;const time=Date.now();const msgId=myId+'-'+time+'-'+Math.random();ensureGlobalContact();const msgData={msgId,senderId:myId,senderName:myName,senderColor:myColor,text,time};contacts[GLOBAL_ID].messages.push({...msgData});globalMsgCache.add(msgId);dbRef.push().set(msgData);saveLocalData();}
 
 (function(){const c=$('particles');for(let i=0;i<12;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*3+1;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.background=Math.random()>0.5?'var(--accent)':'var(--global-color)';p.style.animationDuration=(Math.random()*15+10)+'s';p.style.animationDelay=(Math.random()*10)+'s';c.appendChild(p);}})();
 
@@ -371,92 +372,55 @@ document.getElementById('tabVidYoutube').onclick = () => {
     document.getElementById('embedUploadArea').style.display = 'none';
     document.getElementById('customUploadArea').style.display = 'none';
     document.getElementById('liveTvUploadArea').style.display = 'none';
-    
-    document.getElementById('tabVidYoutube').style.borderColor = 'var(--danger)';
-    document.getElementById('tabVidYoutube').style.color = 'var(--danger)';
-    document.getElementById('tabVidEmbed').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidEmbed').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidCustom').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidLive').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidYoutube').style.borderColor = 'var(--danger)'; document.getElementById('tabVidYoutube').style.color = 'var(--danger)';
+    document.getElementById('tabVidEmbed').style.borderColor = 'var(--border)'; document.getElementById('tabVidEmbed').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidCustom').style.borderColor = 'var(--border)'; document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidLive').style.borderColor = 'var(--border)'; document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
 };
-
 document.getElementById('tabVidEmbed').onclick = () => {
     document.getElementById('youtubeUploadArea').style.display = 'none';
     document.getElementById('embedUploadArea').style.display = 'block';
     document.getElementById('customUploadArea').style.display = 'none';
     document.getElementById('liveTvUploadArea').style.display = 'none';
-    
-    document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidEmbed').style.borderColor = 'var(--accent2)';
-    document.getElementById('tabVidEmbed').style.color = 'var(--accent2)';
-    document.getElementById('tabVidCustom').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidLive').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)'; document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidEmbed').style.borderColor = 'var(--accent2)'; document.getElementById('tabVidEmbed').style.color = 'var(--accent2)';
+    document.getElementById('tabVidCustom').style.borderColor = 'var(--border)'; document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidLive').style.borderColor = 'var(--border)'; document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
 };
-
 document.getElementById('tabVidCustom').onclick = () => {
     document.getElementById('youtubeUploadArea').style.display = 'none';
     document.getElementById('embedUploadArea').style.display = 'none';
     document.getElementById('customUploadArea').style.display = 'block';
     document.getElementById('liveTvUploadArea').style.display = 'none';
-    
-    document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidEmbed').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidEmbed').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidCustom').style.borderColor = 'var(--accent2)';
-    document.getElementById('tabVidCustom').style.color = 'var(--accent2)';
-    document.getElementById('tabVidLive').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)'; document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidEmbed').style.borderColor = 'var(--border)'; document.getElementById('tabVidEmbed').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidCustom').style.borderColor = 'var(--accent2)'; document.getElementById('tabVidCustom').style.color = 'var(--accent2)';
+    document.getElementById('tabVidLive').style.borderColor = 'var(--border)'; document.getElementById('tabVidLive').style.color = 'var(--text-muted)';
 };
-
 document.getElementById('tabVidLive').onclick = () => {
     document.getElementById('youtubeUploadArea').style.display = 'none';
     document.getElementById('embedUploadArea').style.display = 'none';
     document.getElementById('customUploadArea').style.display = 'none';
     document.getElementById('liveTvUploadArea').style.display = 'block';
-    
-    document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidEmbed').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidEmbed').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidCustom').style.borderColor = 'var(--border)';
-    document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
-    document.getElementById('tabVidLive').style.borderColor = 'var(--accent)';
-    document.getElementById('tabVidLive').style.color = 'var(--accent)';
+    document.getElementById('tabVidYoutube').style.borderColor = 'var(--border)'; document.getElementById('tabVidYoutube').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidEmbed').style.borderColor = 'var(--border)'; document.getElementById('tabVidEmbed').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidCustom').style.borderColor = 'var(--border)'; document.getElementById('tabVidCustom').style.color = 'var(--text-muted)';
+    document.getElementById('tabVidLive').style.borderColor = 'var(--accent)'; document.getElementById('tabVidLive').style.color = 'var(--accent)';
 };
 
 // EMBED CODE POST HANDLER
 document.getElementById('btnPostEmbed').onclick = () => {
     const rawCode = document.getElementById('embedCodeInput').value.trim();
     const title = document.getElementById('embedTitleInput').value.trim() || 'Embed Video';
-    
     if(!rawCode) return showToast('Paste embed code dulu!', 'error');
-    
     const srcMatch = rawCode.match(/SRC\s*=\s*"([^"]+)"/i) || rawCode.match(/src\s*=\s*'([^']+)'/i);
     if(srcMatch && srcMatch[1]) {
         const videoSrc = srcMatch[1];
-        const db = firebase.database();
-        const newVidRef = db.ref('videos').push();
-        newVidRef.set({
-            type: 'custom',
-            src: videoSrc,
-            title: title,
-            time: Date.now(),
-            addedBy: myName || 'Admin'
-        }).then(() => {
+        firebase.database().ref('videos').push().set({ type: 'custom', src: videoSrc, title, time: Date.now(), addedBy: myName || 'Admin' }).then(() => {
             showToast('Embed video berhasil diposting!', 'success');
-            document.getElementById('embedCodeInput').value = '';
-            document.getElementById('embedTitleInput').value = '';
+            document.getElementById('embedCodeInput').value = ''; document.getElementById('embedTitleInput').value = '';
         }).catch(err => showToast('Gagal post: ' + err.message, 'error'));
-        
-    } else {
-        showToast('Gagal membaca SRC dari iframe. Pastikan ada SRC="..."', 'error');
-    }
+    } else { showToast('Gagal membaca SRC dari iframe. Pastikan ada SRC="..."', 'error'); }
 };
 
 // INIT SETUP
@@ -464,11 +428,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     const saved=loadLocalData();
     if(saved&&saved.myId){myId=saved.myId;myName=saved.myName;myColor=saved.myColor||getColorFor(myId);globalMsgCache=new Set(saved.globalMsgCache||[]);if(saved.contacts){Object.keys(saved.contacts).forEach(id=>{contacts[id]=saved.contacts[id];contacts[id].connection=null;});}}else{initPeer();}
     if(myId){$('myIdDisplay').textContent=myId;$('usernameInput').value=myName;$('btnJoin').disabled=false;}
-    
-    // PERBAIKAN BUG: Load background langsung saat halaman dibuka
     loadBackground();
     
-    $('usernameInput').addEventListener('input',()=>{$('btnJoin').disabled=!$('usernameInput').value.trim();});
+    $('usernameInput').addEventListener('input',()=>{$('btnJoin').disabled=!($('usernameInput').value.trim());});
     $('btnJoin').addEventListener('click',()=>{myName=$('usernameInput').value.trim();if(!myName)return;if(!myPeer)initPeer();$('entrance').classList.add('hidden');$('chatApp').classList.add('active');$('myAvatar').textContent=getInitial(myName);$('myNameDisplay').textContent=myName;$('myIdSmall').textContent=myId;initFirebase();renderContacts();saveLocalData();});
     $('btnCopyId').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
     $('btnCopyId2').addEventListener('click',()=>{navigator.clipboard.writeText(myId);showToast('ID disalin!','success');});
@@ -486,7 +448,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     $('btnResetBg').addEventListener('click',()=>{$('wallpaper').style.backgroundImage='none';$('wallpaper').style.backgroundColor='var(--bg-deep)';saveBackground();});
     let adminLoggedIn=false;const ADMIN_HASH='admin123';$('btnAdmin').addEventListener('click',()=>$('adminModal').classList.add('show'));$('adminModalClose').addEventListener('click',()=>$('adminModal').classList.remove('show'));
     $('btnAdminLogin').addEventListener('click',()=>{if($('adminPassInput').value===ADMIN_HASH){adminLoggedIn=true;$('adminLoginArea').style.display='none';$('adminActionsArea').style.display='block';showToast('Login admin berhasil!','success');}else{showToast('Password salah!','error');}});
-    $('btnClearGlobal').addEventListener('click',()=>{if(!confirm('Hapus semua chat global?'))return;dbRef.remove();firebase.database().ref('lastGlobalMsg').remove();contacts[GLOBAL_ID].messages=[];globalMsgCache.clear();renderMessages();showToast('Chat global dihapus.','success');});
+    $('btnClearGlobal').addEventListener('click',()=>{if(!confirm('Hapus semua chat global?'))return;dbRef.remove();contacts[GLOBAL_ID].messages=[];globalMsgCache.clear();renderMessages();showToast('Chat global dihapus.','success');});
     $('btnClearOnline').addEventListener('click',()=>{if(!confirm('Bersihkan data online?'))return;firebase.database().ref('onlineUsers').remove();showToast('Data online dibersihkan.','success');});
     $('btnClearVideos').addEventListener('click',()=>{if(!confirm('Hapus semua video & TV?'))return;firebase.database().ref('videos').remove();showToast('Video dihapus.','success');});
     $('btnPostYt').addEventListener('click',()=>{const link=$('ytLinkInput').value.trim();const title=$('ytTitleInput').value.trim()||'YouTube Video';const vid=extractYtId(link);if(!vid){showToast('Link YouTube tidak valid.','error');return;}const src=`https://www.youtube.com/embed/${vid}?autoplay=0`;firebase.database().ref('videos').push().set({type:'youtube',src,title,time:Date.now(),addedBy:myName||'Admin'}).then(()=>{showToast('YouTube diposting!','success');$('ytLinkInput').value='';$('ytTitleInput').value='';});});
